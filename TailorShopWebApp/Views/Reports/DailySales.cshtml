@@ -1,0 +1,36 @@
+﻿@model List<TailorManagementApp.Models.SalesModule.Sales>
+@{
+    ViewBag.Title = "Daily Sales";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-block">
+                    <div class="box box-body  box-primary">
+                        <form id="form1">
+                            <label>Daily Sales For : </label>
+                            <input type="date" name="getDate" class="form-control" />
+                            <input type="button" class="btn btn-primary btn-sm" value="Ok" id="submit" />
+                        </form>
+                    </div>
+
+                    <div id="renderTable" class="box box-body box-default">
+                        @await Html.PartialAsync("_DailySalesPartialView", Model)
+                    </div>
+
+                    </div></div></div></div>
+                    @section scripts{
+                        <script>
+                            $(document).ready(function () {
+                                $('#submit').on('click', function () {
+                                    $('#renderTable').load("../DailySalesFor", $('#form1').serialize());
+                                });
+                            });</script>
+                    }
+                    <style>
+
+                        #renderTable {
+                            background-color: white;
+                        }
+                    </style>

@@ -1,0 +1,78 @@
+﻿@model TailorManagementApp.Models.RentModel.RentReturn
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-block">
+                <div>
+                    <h4>Return Details</h4>
+                    <hr />
+
+                    <dl class="row">
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.ReturnedDate)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.ReturnedDate)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Discount)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Discount)
+                        </dd>
+
+                        @foreach (var item in Model.RentReturnDetails)
+                        {
+                            <dt class="col-sm-4">
+                                @Html.DisplayNameFor(model => item.ID)
+                            </dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => item.ID)
+                            </dd>
+                            <dt class="col-sm-4">
+                                @Html.DisplayNameFor(model => item.StockID)
+                            </dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => item.StockID)
+                            </dd>
+                            <dt class="col-sm-4">
+                                @Html.DisplayNameFor(model => item.Quantity)
+                            </dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => item.Quantity)
+                            </dd>
+                            <dt class="col-sm-4">
+                                @Html.DisplayNameFor(model => item.Rate)
+                            </dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => item.Rate)
+                            </dd>
+                            <dt class="col-sm-4">
+                                @Html.DisplayNameFor(model => item.Amount)
+                            </dt>
+                            <dd class="col-sm-8">
+                                @Html.DisplayFor(model => item.Amount)
+                            </dd>
+                        }
+
+                    </dl>
+                </div>
+            </div>
+            <div>
+                <a class="btn btn-success" style="margin-bottom:12px;float:right;" href="../Index/">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script src="~/js/NavActive.js"></script>
+
+}

@@ -1,0 +1,76 @@
+﻿@model TailorManagementApp.Models.InventoryModel.Item
+@using TailorManagementApp.Models.InventoryModel;
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-block">
+                    <h5 class="m-b-10"><i class="ti-tag"></i>Create A New Item</h5>
+                    <hr />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-block">
+                    <form asp-action="Create" enctype="multipart/form-data">
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Name</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Name" type="text" class="form-control">
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Unit</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="Unit" class="form-control" asp-items="@Html.GetEnumSelectList(typeof(UnitType))">
+                                            <option selected="selected" value="">Please select</option>
+                                        </select>
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Description</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Description" type="text" class="form-control">
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Upload File</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="ImageUpload" id="imageBrowes">
+
+                                        <hr />
+                                    </div>
+                                </div>
+                                <div class="form-group row" style="float:right">
+                                    <div class="col-sm-12">
+                                        <input type="submit" value="create" class="btn btn-success" />
+                                        <a href="/Items/Index/" class="btn btn-info">Back To List</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div id="imgPreview" class="gallery" style="display:none; ">
+                                    <img class="img-responsive" id="targetImg" width="300" height="300" />
+                                    <div class="caption">
+                                        <a href="#" onclick="ClearPreview()"><i class="ti-trash"></i></a>
+                                        <span id="description"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                    </div></div></div></div>

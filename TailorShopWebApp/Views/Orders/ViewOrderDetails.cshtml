@@ -1,0 +1,115 @@
+﻿@model IEnumerable<TailorManagementApp.Models.OrderDetail>
+
+@{
+    ViewData["Title"] = "ViewOrderDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-block">
+                    <h1>Order Details</h1>
+                    
+                    @foreach (var item in Model)
+                    {
+                <div class="col-md-12">
+                    <dl class="row">
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => item.Category.Name)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => item.Category.Name)
+                        </dd>
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => item.Quantity)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => item.Quantity)
+                        </dd>
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => item.Price)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => item.Price)
+                        </dd>
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => item.TotalPrice)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => item.TotalPrice)
+                        </dd>
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => item.Paid)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => item.Paid)
+                        </dd>
+                    </dl>
+                    @foreach (var i in item.OrderDetalMeasurements)
+                    {
+
+
+                        <form method="post" asp-action="EditOrderMeasurements">
+                            <input type="hidden" value=@i.OrderDetailID class="form-control" id="OrderDetailID" name="OrderDetailID" />
+                            <input type="hidden" value=@i.MeasurementID class="form-control" id="MeasurementID" name="MeasurementID" />
+                            <table class="table-striped">
+                                <thead>
+                                    <tr><td>@i.Measurement.Name</td></tr>
+                                    <tr>
+                                       
+                                        <td><input value=@i.MeasurementValue type="text" id="MeasurementValue" name="MeasurementValue" class="form-control"/></td>
+                                        <td><input type="submit" value="Edit" class="form-control" /></td>
+                                    </tr>
+
+                            </table>
+
+                        </form>
+                    
+                        
+                                }
+                    </div>
+                   }
+                <div>
+                    <a class="btn btn-success" style="margin-bottom:12px;float:right;" href="/Orders/ViewOrder/">Back to List</a>
+                </div>
+                        
+            </div>
+          </div>
+        </div>
+     </div>
+   @section scripts{
+       <script>
+           $('#updatedata').on('click', function () {
+
+               $("#updatedata").attr("disabled", true);
+ 
+
+                   var formData = new Object();
+                   formData = $('#form1').serialize();
+                   if (formData != "") {
+                       $.ajax({
+                           type: "POST",
+                           url: "/Orders/EditOrderMeasurements/",
+                           dataType: 'json',
+
+                           data: formData,
+
+
+                           success: function (data) {
+                               if (data != null) {
+                                   swal("Updated!");
+                                    $("#updatedata").attr("disabled", false);
+                               }
+                               else {
+                                  
+                                   swal("Something went wrong!");
+                               }
+                           }
+                       });
+                   }
+                   return false;
+          
+           });
+      
+</script>
+    }

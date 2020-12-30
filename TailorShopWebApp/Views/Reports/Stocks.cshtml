@@ -1,0 +1,200 @@
+﻿@model IEnumerable<TailorManagementApp.Models.InventoryModel.Stock>
+@{
+    ViewData["Title"] = "Stocks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-block">
+                    <h5>Stocks</h5>
+                    <form asp-action="Filter" method="get">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <div class="col-sm-8">
+                                        <select name="option" class="form-control">
+                                            <option value="">--Select any--</option>
+                                            <option value="3">Last in 3 months </option>
+                                            <option value="2">Last in 2 months </option>
+                                            <option value="1">Last in 1 months </option>
+
+                                        </select>
+                                    </div>
+                                    <div class="form-group row" style="float:right">
+                                        <div class="col-sm-4">
+                                            <input type="submit" value="Submit" class="btn btn-success" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form asp-action="FilterDate" method="get">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">From</label>
+                                    <div class="col-sm-10">
+                                        <input type="date" class="form-control" name="fromDate">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">To</label>
+                                    <div class="col-sm-10">
+                                        <input type="date" class="form-control" name="toDate">
+                                    </div>
+                                </div>
+                                <div class="form-group row" style="float:right">
+                                    <div class="col-sm-12">
+                                        <input type="submit" value="Submit" class="btn btn-success" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <label>@ViewData["msg"]</label>
+
+                    <div id="invoice-box" style="align-content:center">
+                        <table>
+
+                            <tr>
+                                <td>
+                                    <table class="table table-bordered " id="productTable">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Category)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.InitialQuantity)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Quantity)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CostPrice)
+                                                </th>
+
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Item)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Purchase.Date)
+                                                </th>
+                                                <th>
+                                                    Status
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Category)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.InitialQuantity)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Quantity)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CostPrice)
+                                                    </td>
+
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Item.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Purchase.Date)
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            if (item.Quantity > 0)
+                                                            {
+                                                                <label>Available</label>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <label>Out of Stock</label>
+                                                            }
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+
+
+                            </tr>
+
+                            <tr class="total">
+                                <td><b>Total Cost :</b>@Model.Select(x => x.CostPrice).Sum().ToString()</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    </div></div></div></div>
+
+
+
+
+                    <input type="button" id="btnExport" value="Export" onclick="generatePDF()" />
+                    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+
+                    @section scripts{
+
+                        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+                        <script src="~/html2pdf.js-master/html2pdf.js-master/dist/html2pdf.bundle.min.js"></script>
+                        <script>
+
+        $(document).ready(function () {
+            $('#productTable').DataTable({
+                "paging": false,
+                "ordering": false,
+                "info": false,
+
+            });
+        });
+
+        function generatePDF() {
+            
+            var divContents = $("#invoice-box").html();
+            var printWindow = window.open('', '', 'height=400,width=800');
+            printWindow.document.write('<html><head><title>Stock Report</title>');
+            printWindow.document.write('</head><body >');
+            printWindow.document.write('<div><h1>Stock Report</br><h1></div>');
+            printWindow.document.write('<div><b>Date : </b>@DateTime.UtcNow<br>Marinoft<br>Karnafuli Tower<br>Chittagong,Bangladesh<br /><hr />Developer<br>Taylor Swift<br>taylor@example.com</div>');
+            printWindow.document.write(divContents);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        //});
+        }
+      function filterData() {
+
+            var formData = new Object();
+            formData = $('#form1').serialize();
+          if (formData != null) {
+              $.ajax({
+                  type: "POST",
+                  url: "/Report/FilterStocks",
+                  dataType: 'json',
+                  // contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                  data: formData
+              });
+          }
+
+    }
+        $('#showAll').on('click', function () {
+            location.reload(true);
+        });
+                        </script>
+
+                    }
+
+

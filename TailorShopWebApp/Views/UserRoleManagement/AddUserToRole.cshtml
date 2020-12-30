@@ -1,0 +1,43 @@
+﻿@model TailorManagementApp.Models.User.UserRole
+
+@{
+    ViewData["Title"] = "AddUserToRole";
+}
+
+<h3 class="text-center">Add User To Role</h3>
+<hr />
+
+<div class="row" style="margin-bottom:10px;">
+    <div class="col-8 offset-2">
+        <a asp-action="AddRole" asp-controller="UserRoleManagement" class="btn btn-primary mr-2">New Role</a>
+        <a asp-action="DisplayRoles" class="btn btn-success mr-2">View Roles</a>
+        <a asp-action="AddUserToRole" class="btn btn-info mr-2">Assign user to role</a>
+        <a asp-action="Index" asp-controller="UserRoleManagement" class="btn btn-primary">View Assigned Users</a>
+    </div>
+</div>
+
+<hr />
+<div class="container">
+    <div class="row">
+        <div class="col-6 offset-3">
+            <form asp-action="AddUserToRole" method="post">
+                <div class="form-group">
+                    <label>Select UserName</label>
+                    <select asp-for="UserID" asp-items="@ViewBag.Users" class="form-control">
+                        <option selected disabled>--Select User--</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Role Name</label>
+                    <select asp-for="Role" asp-items="@ViewBag.Roles" class="form-control">
+                        <option selected disabled>--Select Role</option>
+                    </select>
+                </div>
+
+                <input type="submit" class="btn btn-outline-primary btn-block" value="Assign" />
+                <a asp-action="Index" class="btn btn-outline-danger btn-block">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

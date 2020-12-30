@@ -1,0 +1,303 @@
+﻿@model IEnumerable<TailorManagementApp.Models.InventoryModel.Stock>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-block">
+                <h5 class="m-b-10"><i class="ti-tag"></i>Rent an Item</h5>
+                <hr />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-block">
+                <div class="row">
+                    <div id="MainDiv" class="col-md-12">
+
+                        <hr />
+                        <div class="box box-danger box-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-striped">
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="StockID" id="getStockID" readonly />
+                                                <strong>Item</strong><br />
+                                                <input type="text" id="getItem" readonly class="form-control input-sm" />
+                                            </td>
+                                            <td>
+                                                <input type="hidden" id="getAvailability" readonly class="form-control input-sm" />
+                                                <strong>Qty</strong><br />
+                                                <input type="text" tabindex="1" name="Qty" id="getQty" onkeyup="CalculateRate()" class="form-control input-sm NumbersOnly" />
+                                            </td>
+                                            <td>
+                                                <strong>Rate</strong><br />
+                                                <input type="text" name="Rate" id="getRate" readonly class="form-control input-sm " />
+                                            </td>
+                                            <td>
+                                                <strong>Amount</strong><br />
+                                                <input type="text" id="getAmount" readonly class="form-control input-sm" />
+                                            </td>
+                                            <td>
+                                                <br />
+                                                <input type="button" tabindex="2" value="Add to list" id="saleButtonAdd" style="float:right; margin-right:10px" class="btn btn-primary btn-sm" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-striped table-hover" id="maintable">
+                                        <thead>
+                                            <tr style="background-color:cornflowerblue">
+                                                <th>
+                                                    StockID
+                                                </th>
+                                                <th>
+                                                    Item
+                                                </th>
+
+                                                <th>
+                                                    Quantity
+                                                </th>
+                                                <th>
+                                                    Rate
+                                                </th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        @foreach (var item in Model)
+                                        {
+                                    <tr class="rows">
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StockID)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Item.Name)
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Quantity)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.SellingPrice)
+                                        </td>
+                                        <td>
+                                            <a id="SelectRow" class="btn btn-info"><i class="ti-check-box"></i></a>
+                                        </td>
+                                    </tr>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-sm-12 ">
+                        <div class="box box-danger box-body" style="height:350px">
+                            <!-- Begin of Form to be serialized  -->
+                            <form id="formSerializedRent">
+                                <div class="row" id="btnModalTrigger">
+                                    <div class="col-md-2" style="float:right"><b></b></div>
+                                    <div class="col-md-4">Total :<input type="hidden" class="setTotal" style="border:hidden;" readonly /><span class="setTotalText pull-right"><b>$</b></span></div>
+                                    <div class="col-md-6">
+                                        <button data-toggle="modal" class="btn btn-grd-primary col-md-6" data-target="#myModal" style="cursor:pointer">
+                                            Next<span class="ti-control-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <hr />
+                                <label><b>Customer :</b></label>
+                                <div>
+                                    @Html.DropDownList("customers", ViewBag.CustomerID, "-- Select Customer -- ", new { @class = "customers form-control" })
+                                    <span class="error text-danger"></span>
+                                </div>
+                                <br />
+                                <hr />
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <div class="row">
+                                            <div class="col-md-12" style="height:200px; ">
+                                                <table class="table table-condensed table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Name</th>
+                                                            <th>Quantity</th>
+                                                            <th>Rate</th>
+                                                            <th>Amount</th>
+                                                            <th><span class="ti-trash"></span></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tblAppendHere"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Modal -->
+                                <div class="modal fade bs-example-modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="btn btn-primary" data-dismiss="modal"><span aria-hidden="true"></span>Close</button>
+                                                <h4 class="modal-title" id="myModalLabel">Check out</h4>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                <table class="table table-striped">
+                                                    <tr>
+                                                        <td>Total</td>
+                                                        <td><input type="text" name="Total" class="form-control setTotal" style=" border:hidden" readonly /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Discount %</td>
+                                                        <td><input type="text" tabindex="3" class="form-control NumbersAndDecimal" name="discountPercent" id="discountPercent" required /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Discount amt</td>
+                                                        <td><input type="text" name="discountAmount" class="form-control " id="discountAmount" readonly /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Payable</td>
+                                                        <td><input type="text" name="grandTotal" class="form-control " id="grandTotal" readonly /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Advance Payment</td>
+                                                        <td><input type="text" name="AdvancePayment" tabindex="4" class="form-control NumbersAndDecimal" id="receivedAmt" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Remarks</td>
+                                                        <td><input type="text" name="Remarks" class="form-control remarks" id="remarks" /></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Return Date</td>
+                                                        <td>
+                                                            <input type="date" name="ReturnDate" id="date" class="form-control" />
+                                                        </td>
+                                                    </tr>
+
+
+                                                </table>
+
+
+
+                                            </div>
+                                            <div class="modal-footer" style="padding:3px;background-color:#16a085; cursor:pointer" tabindex="5" id="btnCheckOutRent">
+
+                                                <h4 class="btn btn-primary" style="text-align:center"> Done &nbsp;</h4>
+
+                                            </div>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--End of form to be serialized-->
+                            </form>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+@section scripts{
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="~/js/sale.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#maintable').DataTable({
+                "paging": false,
+                "ordering": true,
+                "bFilter": false,
+                "info": false
+            });
+        });
+        $('#btnCheckOutRent').on('click', function () {
+
+            // $("#btnCheckOutRent").attr("disabled", true);
+            //$("#btnCheckOutRent").html('Please wait ...');
+            // $("#setTotal").css('border-color', '');
+            //$("#grandTotal").css('border-color', '');
+            //$("#date").css('border-color', '');
+            //$("#AdvancePayment").css('border-color', '');
+
+            if ($('.customers').val() == "" || $('.customers').val() == NaN || $('.customers').val() == null) {
+                alert("You Have not selected any customer yet");
+                $("#customers").css('border-color', 'red');
+
+            }
+            else if ($('.setTotal').val() == "" || $('.setTotal').val() == NaN || $('.setTotal').val() == null) {
+                $(".setTotal").css('border-color', 'red');
+            }
+            else if ($('#discountPercent').val() == "" || $('#discountPercent').val() == NaN || $('#discountPercent').val() == null) {
+                $("#discountPercent").css('border-color', 'red');
+            }
+            else if ($('#grandTotal').val() == "" || $('#grandTotal').val() == NaN || $('#grandTotal').val() == null) {
+                $("#grandTotal").css('border-color', 'red');
+            }
+            else if ($('#receivedAmt').val() == "" || $('#receivedAmt').val() == NaN || $('#receivedAmt').val() == null) {
+                $("#receivedAmt").css('border-color', 'red');
+            }
+
+
+
+            else if ($('#date').val() == "" || $('#date').val() == NaN || $('#date').val() == null) {
+                $("#date").css('border-color', 'red');
+            }
+
+            else {
+
+                var formData = new Object();
+                formData = $('#formSerializedRent').serialize();
+
+                $("#btnCheckOutRent").attr("disabled", true);
+                $("#btnCheckOutRent").html('Please wait ...');
+                if (formData != null) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/RentEntries/SerializeFormData/",
+                        dataType: 'json',
+
+                        data: formData,
+
+                        success: function (data) {
+                            if (data != null) {
+                                $('#myModal').modal('hide');
+                                window.location = "/Rents/Index/";
+                            }
+                            else {
+                                $('#myModal').modal('hide');
+                                swal("Some inputs may be missing!");
+                            }
+                        }
+                    });
+                }
+                return false;
+            }
+
+        });
+    </script>
+}

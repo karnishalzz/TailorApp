@@ -1,0 +1,89 @@
+﻿@model TailorManagementApp.Models.PurchaseModel.Purchase
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-block">
+                <div id="placeHolder"></div>
+                <h3>Purchase Details</h3>
+                <table class="table table-condensed">
+                    <tr>
+                        <td>Purchase ID</td>
+                        <td>@Model.PurchaseID</td>
+                    </tr>
+                    <tr>
+                        <td>Supplier Name</td>
+                        <td>@Model.Supplier.Name</td>
+                    </tr>
+                    <tr>
+                        <td>Date</td>
+                        <td>@Model.Date</td>
+                    </tr>
+                    <tr>
+                        <td>Amount</td>
+                        <td>@Model.Amount</td>
+                    </tr>
+                    <tr>
+                        <td>Discount</td>
+                        <td>@Model.Discount</td>
+                    </tr>
+                    <tr>
+                        <td>Tax</td>
+                        <td>@Model.Tax</td>
+                    </tr>
+                    <tr>
+                        <td>Total Cost</td>
+                        <td>@Model.GrandTotal</td>
+                    </tr>
+                </table>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped">
+                            <thead class="dataTableHead">
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Amount</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            @foreach (var item in Model.PurchaseDetails)
+                            {
+                                <tr>
+                                    <td>@item.Item.Name </td>
+                                    <td>@item.Quantity </td>
+                                    <td>@item.CostPrice </td>
+                                    <td>
+                                        <a data-toggle="ajax-modal" id="MeasurementButton" data-target="#purchaseModal" data-url="@Url.Action($"Edit/{item.PurchaseDetailID}")"><i class="ti-pencil"></i></a>
+
+                                    </td>
+                                </tr>
+                            }
+
+
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <a class="btn btn-success" style="margin-bottom:12px;float:right;" href="/Purchases/Index/">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+
+@section scripts{
+
+    <script type="text/javascript" src="~/js/Popup.js"></script>
+
+    <script src="~/js/NavActive.js"></script>
+
+
+
+}
