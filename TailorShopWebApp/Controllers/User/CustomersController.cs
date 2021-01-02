@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Controllers.Others;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using TailorManagementApp.Models;
 using TailorManagementApp.Models.Base;
 using TailorShopWebApp.Data;
@@ -26,12 +23,12 @@ namespace TailorManagementApp.Controllers
         private readonly IWebHostEnvironment _env;
         public ImageUploader _imageUploader = new ImageUploader();
 
-        public CustomersController(ApplicationDbContext context,IWebHostEnvironment env)
+        public CustomersController(ApplicationDbContext context, IWebHostEnvironment env)
         {
             _context = context;
             _env = env;
         }
-       
+
         // GET: Customers
 
         public async Task<IActionResult> Index()
@@ -81,7 +78,7 @@ namespace TailorManagementApp.Controllers
             //wwwroot/Users/
             string dbImagePath = Path.Combine($"{Path.DirectorySeparatorChar}CustomerImages{Path.DirectorySeparatorChar}");
             //Users/
-            
+
             _imageUploader.CreateDirectory(applicationImagePath);//wwwroot/Users
             if (customer.ImageUpload != null)
             {
@@ -89,7 +86,7 @@ namespace TailorManagementApp.Controllers
                 customer.ImagePath = dbPath ?? "N/A";
             }
             else { customer.ImagePath = "N/A"; }
-           
+
             if (ModelState.IsValid)
             {
                 customer.RegisterDate = DateTime.Now;
@@ -123,7 +120,7 @@ namespace TailorManagementApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
- 
+
         public async Task<IActionResult> Edit(int id, [Bind("CustomerID,Name,Phone,Address,ImageUpload")] Customer customer)
         {
             if (id != customer.CustomerID)
@@ -148,8 +145,8 @@ namespace TailorManagementApp.Controllers
                     if (dbPath != null)
                     {
                         _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + customerToUpdate.ImagePath);
-                        
-                      
+
+
                         if (await TryUpdateModelAsync<Customer>(customerToUpdate, "", i => i.Name, i => i.Phone, i => i.Address))
                         {
                             customerToUpdate.ImagePath = dbPath;
@@ -172,24 +169,24 @@ namespace TailorManagementApp.Controllers
                     {
                         await _context.SaveChangesAsync();
                     }
-                    
+
                 }
 
             }
-            
-                catch (DbUpdateConcurrencyException)
+
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CustomerExists(customer.CustomerID))
                 {
-                    if (!CustomerExists(customer.CustomerID))
-                    {
                     return View(customer);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Unable to save changes. " +
-                            "Try again, and if the problem persists, " +
-                            "see your system administrator.");
-                    }
                 }
+                else
+                {
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
+                }
+            }
             return Redirect("~/Customers/Index/");
 
 
@@ -237,7 +234,7 @@ namespace TailorManagementApp.Controllers
             string msg = formCollection["msg"].ToString();
             string[] ids = formCollection["ID"].ToString().Split(',');
             var state = true;
-            int count=0;
+            int count = 0;
             foreach (string id in ids)
             {
                 if (state)
@@ -245,7 +242,7 @@ namespace TailorManagementApp.Controllers
                     var customer = _context.Customers.Find(int.Parse(id));
                     var phone = "+88" + customer.Phone;
                     state = await SendSms(phone, msg);
-                    if(state==true)count++;
+                    if (state == true) count++;
                 }
                 else
                 {
@@ -263,12 +260,12 @@ namespace TailorManagementApp.Controllers
         {
             try
             {
-                var accountSID = "AC2e2721bbf5401ae360e4d8e56e3c488f";
-                var authToken = "dbdee64a53fbec712c8bd02668c63947";
+                var accountSID = "";
+                var authToken = "";
                 TwilioClient.Init(accountSID, authToken);
 
                 var to = new PhoneNumber(phone);
-                var from = new PhoneNumber("+19285855816");
+                var from = new PhoneNumber("");
 
                 var response = await MessageResource.CreateAsync(
                     to: to,

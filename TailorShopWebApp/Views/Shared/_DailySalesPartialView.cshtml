@@ -80,27 +80,6 @@
                         "ordering": true,
                         "info": true
                     });
-        var tableTools = new $.fn.dataTable.TableTools(table, {
-            'aButtons': [
-                {
-                    'sExtends': 'xls',
-                    'sButtonText': 'Save to Excel',
-                    'sFileName': 'DailySales.xls'
-                },
-                {
-                    'sExtends': 'print',
-                    'bShowAll': true,
-                },
-                {
-                    'sExtends': 'pdf',
-                    'bFooter': true,
-                    'bShowAll': true,
-                    'sPdfMessage': 'Your custom message would go here.'
-                },
-                'copy'
-            ],
-            'sSwfPath': 'http://cdn.datatables.net/tabletools/2.2.4/swf/copy_csv_xls_pdf.swf'
-        });
-        $(tableTools.fnContainer()).insertBefore('#datatable_wrapper');
+       
     });</script>
 }
