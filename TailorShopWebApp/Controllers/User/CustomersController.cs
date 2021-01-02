@@ -263,8 +263,8 @@ namespace TailorManagementApp.Controllers
         {
             try
             {
-                var accountSID = "AC2e2721bbf5401ae360e4d8e56e3c488f";
-                var authToken = "dbdee64a53fbec712c8bd02668c63947";
+                var accountSID = "";
+                var authToken = "";
                 TwilioClient.Init(accountSID, authToken);
 
                 var to = new PhoneNumber(phone);
