@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.InventoryModel;
-using TailorManagementApp.Models.RentModel;
-using TailorShopWebApp.Data;
-using r=TailorManagementApp.Models.RentModel;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.InventoryModel;
+using TailorApp.Domain.Entities.RentModel;
+using TailorApp.Infrastructure.Data;
+using r = TailorApp.Domain.Entities.RentModel;
 
 namespace TailorManagementApp.Controllers.Rent
 {

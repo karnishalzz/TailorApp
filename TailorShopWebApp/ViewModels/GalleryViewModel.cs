@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.InventoryModel;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.InventoryModel;
 
 namespace TailorManagementApp.ViewModels
 {

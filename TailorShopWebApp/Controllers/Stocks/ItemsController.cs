@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.Base;
-using TailorManagementApp.Models.InventoryModel;
-using TailorShopWebApp.Data;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.Base;
+using TailorApp.Domain.Entities.InventoryModel;
+using TailorApp.Infrastructure.Data;
 
 namespace TailorManagementApp.Controllers.StockController
 {

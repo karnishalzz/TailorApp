@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailorShopWebApp", "TailorShopWebApp\TailorShopWebApp.csproj", "{9368868D-50B7-4EBB-8D92-A9BCB0685F66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TailorShopWebApp", "TailorShopWebApp\TailorShopWebApp.csproj", "{9368868D-50B7-4EBB-8D92-A9BCB0685F66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailorApp.Infrastructure", "TailorApp.Infrastructure\TailorApp.Infrastructure.csproj", "{27BCC07B-D686-41F7-9EEE-1C9CAAA09636}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailorApp.Domain", "TailorApp.Domain\TailorApp.Domain.csproj", "{F85C8965-F335-4DCD-9223-3D813247B3ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{9368868D-50B7-4EBB-8D92-A9BCB0685F66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9368868D-50B7-4EBB-8D92-A9BCB0685F66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9368868D-50B7-4EBB-8D92-A9BCB0685F66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27BCC07B-D686-41F7-9EEE-1C9CAAA09636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27BCC07B-D686-41F7-9EEE-1C9CAAA09636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27BCC07B-D686-41F7-9EEE-1C9CAAA09636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27BCC07B-D686-41F7-9EEE-1C9CAAA09636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F85C8965-F335-4DCD-9223-3D813247B3ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F85C8965-F335-4DCD-9223-3D813247B3ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F85C8965-F335-4DCD-9223-3D813247B3ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F85C8965-F335-4DCD-9223-3D813247B3ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

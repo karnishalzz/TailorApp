@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TailorManagementApp.Models;
-using TailorShopWebApp.Data;
+using TailorApp.Domain.Entities;
+using TailorApp.Infrastructure.Data;
 
 namespace TailorManagementApp.Controllers
 {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.RentModel;
-using TailorManagementApp.Models.SalesModule;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.RentModel;
+using TailorApp.Domain.Entities.SalesModule;
 
 namespace TailorManagementApp.ViewModels
 {

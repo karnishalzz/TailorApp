@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TailorManagementApp.Models.PurchaseModel;
+using TailorApp.Domain.Entities.PurchaseModel;
 
 namespace TailorManagementApp.ViewModels
 {

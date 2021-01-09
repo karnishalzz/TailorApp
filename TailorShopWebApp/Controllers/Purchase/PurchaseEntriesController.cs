@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.InventoryModel;
-using TailorManagementApp.Models.PurchaseModel;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.InventoryModel;
+using TailorApp.Domain.Entities.PurchaseModel;
+using TailorApp.Infrastructure.Data;
 using TailorManagementApp.ViewModels;
-using TailorShopWebApp.Data;
 
 namespace TailorManagementApp.Controllers.PurchaseController
 {

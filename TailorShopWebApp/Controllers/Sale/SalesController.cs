@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.SalesModule;
-using TailorShopWebApp.Data;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.SalesModule;
+using TailorApp.Infrastructure.Data;
 
 namespace TailorManagementApp.Controllers.Sale
 {
-    
+
     public class SalesController : Controller
     {
         private readonly ApplicationDbContext _context;

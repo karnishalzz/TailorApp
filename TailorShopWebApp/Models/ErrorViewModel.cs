@@ -1,6 +1,6 @@
 using System;
 
-namespace TailorManagementApp.Models
+namespace TailorApp.Domain.Entities
 {
     public class ErrorViewModel
     {

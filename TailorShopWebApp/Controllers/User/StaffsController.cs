@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.Base;
-using TailorShopWebApp.Data;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.Base;
+using TailorApp.Infrastructure.Data;
 
 namespace TailorManagementApp.Controllers
 {

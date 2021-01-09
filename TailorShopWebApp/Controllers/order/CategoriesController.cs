@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Models;
+using TailorApp.Domain.Entities;
+using TailorApp.Infrastructure.Data;
 using TailorManagementApp.ViewModels;
-using TailorShopWebApp.Data;
 
 namespace TailorManagementApp.Controllers
 {

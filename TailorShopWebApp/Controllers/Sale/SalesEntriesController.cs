@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TailorManagementApp.Models;
-using TailorManagementApp.Models.InventoryModel;
-using TailorManagementApp.Models.SalesModule;
-using TailorShopWebApp.Data;
+using TailorApp.Domain.Entities;
+using TailorApp.Domain.Entities.InventoryModel;
+using TailorApp.Domain.Entities.SalesModule;
+using TailorApp.Infrastructure.Data;
 
 namespace TailorManagementApp.Controllers.Sale
 {
@@ -25,10 +25,9 @@ namespace TailorManagementApp.Controllers.Sale
 
         public async Task<IActionResult> Index()
         {
-
-            var stock = await _context.Stocks
-                .Include(i=>i.Item)
-                .Where(i => i.Category== CategoryType.Sale)
+            List<Stock> stock = await _context.Stocks
+                .Include(i => i.Item)
+                .Where(i => i.Category == CategoryType.Sale)
                 .AsNoTracking()
                 .ToListAsync();
             return View(stock);
@@ -66,7 +65,7 @@ namespace TailorManagementApp.Controllers.Sale
                 //insert into sales, sales-items, stock
                 _context.Sales.Add(_sales);
                 _context.SaveChanges();
-                
+
                 InsertSalesItem(_sales.SalesID, _stockID, _qty, _rate, _amt);
                 UpdateStock(_stockID, _qty);
                 UpdateIncome(_grandTotal, _sales.SalesID);
@@ -82,13 +81,15 @@ namespace TailorManagementApp.Controllers.Sale
             int count = _stockID.Count();
             for (int i = 0; i < count; i++)
             {
-                SalesDetail _salesItem = new SalesDetail();
-                _salesItem.SalesID = _salesID;
+                SalesDetail _salesItem = new SalesDetail
+                {
+                    SalesID = _salesID,
 
-                _salesItem.StockID = Convert.ToInt32(_stockID[i]);
-                _salesItem.Rate = Convert.ToDecimal(_rate[i]);
-                _salesItem.Quantity = Convert.ToInt32(_qty[i]);
-                _salesItem.Amount = Convert.ToDecimal(_amt[i]);
+                    StockID = Convert.ToInt32(_stockID[i]),
+                    Rate = Convert.ToDecimal(_rate[i]),
+                    Quantity = Convert.ToInt32(_qty[i]),
+                    Amount = Convert.ToDecimal(_amt[i])
+                };
                 _context.SalesDetails.Add(_salesItem);
                 _context.SaveChanges();
             }
@@ -100,10 +101,10 @@ namespace TailorManagementApp.Controllers.Sale
             {
                 int getStockID = Convert.ToInt32(_stockID[i]);
                 int getQty = Convert.ToInt32(_qty[i]);
-                var stock = _context.Stocks.Find(getStockID);
+                Stock stock = _context.Stocks.Find(getStockID);
                 stock.Quantity = stock.Quantity - getQty;
                 _context.SaveChanges();
-               
+
             }
         }
 
@@ -112,10 +113,10 @@ namespace TailorManagementApp.Controllers.Sale
             Income income = new Income()
             {
                 Date = DateTime.Now,
-                SalesID= salesID,
-                Name ="Sale",
+                SalesID = salesID,
+                Name = "Sale",
                 Description = "-",
-                Price =total
+                Price = total
             };
 
             _context.Incomes.Add(income);

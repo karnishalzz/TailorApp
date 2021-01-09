@@ -8,9 +8,5 @@
     <WebStackScaffolding_DbContextDialogWidth>600</WebStackScaffolding_DbContextDialogWidth>
     <NameOfLastUsedPublishProfile>FolderProfile4</NameOfLastUsedPublishProfile>
   </PropertyGroup>
-  <ItemGroup>
-    <None Update="Data\DataSet1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
+  <ItemGroup />
 </Project>
