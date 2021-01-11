@@ -33,7 +33,9 @@
                     @Html.DropDownList("customers", ViewBag.CustomerID, "-- Select Customer -- ", new { @class = "customers form-control" })
                     <span class="error text-danger"></span>
 
-                    <a class="btn btn-success" style="margin-bottom:12px;float:right;" data-toggle="ajax-modal" id="customerButton" data-target="#customerModal" data-url="/Customers/CreateModal"><i class="ti-plus"></i>Create A New Customer</a>
+                    <a class="btn btn-success" style="margin-bottom:12px;float:right;" data-toggle="ajax-modal" id="customerButton" data-target="#customerModal" data-url="/Customers/CreateModal">
+                        <i class="ti-plus"></i>Create A New Customer
+                    </a>
 
                 </div>
                 <div class="dt-responsive table-responsive">

@@ -63,6 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TailorApp.Application\TailorApp.Application.csproj" />
     <ProjectReference Include="..\TailorApp.Domain\TailorApp.Domain.csproj" />
     <ProjectReference Include="..\TailorApp.Infrastructure\TailorApp.Infrastructure.csproj" />
   </ItemGroup>

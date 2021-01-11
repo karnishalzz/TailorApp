@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
 using TailorManagementApp.ViewModels;
@@ -18,21 +19,29 @@ namespace TailorManagementApp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ICustomerService _customerService;
 
-        public OrdersController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public OrdersController(
+            ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            ICustomerService customerService)
         {
 
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            _customerService = customerService;
         }
+
         [Authorize(Roles = "Admin,Manager")]
-        public IActionResult AddOrder()
+        [HttpGet]
+        public async Task<IActionResult> AddOrder()
         {
-            PopulateCustomerDropDownList();
+            await PopulateCustomerDropDownList();
             PopulateCategoryDropDownList();
             return View();
         }
+
         [Authorize]
         public async Task<IActionResult> ViewOrder()
         {
@@ -87,12 +96,10 @@ namespace TailorManagementApp.Controllers
                                                           select d;
             ViewBag.CategoryID = new SelectList(categoriesQuery.AsNoTracking(), "CategoryID", "Name", selectedCategory);
         }
-        private void PopulateCustomerDropDownList(object selectedCategory = null)
+        private async Task PopulateCustomerDropDownList(int? selectedCategory = null)
         {
-            IOrderedQueryable<Customer> customersQuery = from d in _context.Customers
-                                                         orderby d.Name
-                                                         select d;
-            ViewBag.CustomerID = new SelectList(customersQuery.AsNoTracking(), "CustomerID", "Name", selectedCategory);
+            SelectList customerSelectList = await _customerService.GetSelectListAsync(selectedCategory);
+            ViewBag.CustomerID = customerSelectList;
         }
 
 
@@ -116,7 +123,7 @@ namespace TailorManagementApp.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddOrderAndOrderDetialsAsync(OrderViewModel orderViewModel)
+        public async Task<JsonResult> AddOrderAndOrderDetials(OrderViewModel orderViewModel)
         {
             bool status = true;
 
@@ -144,15 +151,14 @@ namespace TailorManagementApp.Controllers
             status = false;
             return new JsonResult(new { Data = new { status = status, message = "Error !" } });
         }
+
         private decimal _Total;
         private decimal _Paid;
         [Authorize(Roles = "Admin,Manager")]
         private async Task<bool> SaveOrderDetails(OrderViewModel orderViewModel, int orderID)
         {
-
             try
             {
-
                 foreach (ListItems item in orderViewModel.Items)
                 {
                     OrderDetail orderDetails = new OrderDetail()

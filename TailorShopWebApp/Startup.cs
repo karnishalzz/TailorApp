@@ -5,7 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TailorApp.Application.Implementations;
+using TailorApp.Application.Services;
+using TailorApp.Domain.Repositories;
 using TailorApp.Infrastructure.Data;
+using TailorApp.Infrastructure.Data.Repositories;
 
 namespace TailorShopWebApp
 {
@@ -30,6 +34,9 @@ namespace TailorShopWebApp
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
