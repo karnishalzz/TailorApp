@@ -51,6 +51,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
+    <PackageReference Include="TanvirArjel.Extensions.Microsoft.DependencyInjection" Version="1.0.0" />
     <PackageReference Include="Twilio" Version="5.52.1" />
     <PackageReference Include="Twilio.AspNet.Core" Version="5.37.2" />
   </ItemGroup>

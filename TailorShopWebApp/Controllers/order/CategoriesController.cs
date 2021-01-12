@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
@@ -29,15 +27,16 @@ namespace TailorManagementApp.Controllers
         // GET: Categories
         public async Task<IActionResult> Index(int? id)
         {
-            
-           var viewModel = new CategoryViewModel();
-           viewModel.Categories = await _context.Categories
+            CategoryViewModel viewModel = new CategoryViewModel
+            {
+                Categories = await _context.Categories
                   .Include(i => i.Enrollments)
                     .ThenInclude(i => i.Measurement)
                   .AsNoTracking()
                   .OrderBy(i => i.Name)
-                  .ToListAsync();
-           
+                  .ToListAsync()
+            };
+
             if (id != null)
             {
                 ViewData["CategoryID"] = id.Value;
@@ -45,17 +44,17 @@ namespace TailorManagementApp.Controllers
                     i => i.CategoryID == id.Value).Single();
                 viewModel.Measurements = category.Enrollments.Select(s => s.Measurement);
             }
-           
+
 
             return View(viewModel);
         }
 
-       
+
 
         // GET: Categories/Create
         public IActionResult Create()
         {
-            var category = new Category();
+            Category category = new Category();
             PopulateAssignedMeasurement(category);
             return PartialView(category);
         }
@@ -70,9 +69,9 @@ namespace TailorManagementApp.Controllers
             if (selectedMeasurements != null)
             {
                 category.Enrollments = new List<CategoryMeasurement>();
-                foreach (var measurement in selectedMeasurements)
+                foreach (string measurement in selectedMeasurements)
                 {
-                    var measurementToAdd = new CategoryMeasurement { CategoryID = category.CategoryID, MeasurementID = int.Parse(measurement) };
+                    CategoryMeasurement measurementToAdd = new CategoryMeasurement { CategoryID = category.CategoryID, MeasurementID = int.Parse(measurement) };
                     category.Enrollments.Add(measurementToAdd);
                 }
             }
@@ -106,12 +105,12 @@ namespace TailorManagementApp.Controllers
                 return NotFound();
             }
 
-            var category =await _context.Categories
+            Category category = await _context.Categories
                 .Include(c => c.Enrollments)
                 .ThenInclude(s => s.Measurement)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.CategoryID == id);
-            
+
             if (category == null)
             {
                 return NotFound();
@@ -121,12 +120,12 @@ namespace TailorManagementApp.Controllers
         }
         private void PopulateAssignedMeasurement(Category category)
         {
-            var allMeasurements = _context.Measurements;
-            var viewModel = new List<AssignedMeasurements>();
+            DbSet<Measurement> allMeasurements = _context.Measurements;
+            List<AssignedMeasurements> viewModel = new List<AssignedMeasurements>();
             if (category.CategoryID != 0)
             {
-                var categoryMeasurements = new HashSet<int>(category.Enrollments.Select(c => c.MeasurementID));
-                foreach (var measurement in allMeasurements)
+                HashSet<int> categoryMeasurements = new HashSet<int>(category.Enrollments.Select(c => c.MeasurementID));
+                foreach (Measurement measurement in allMeasurements)
                 {
                     viewModel.Add(new AssignedMeasurements
                     {
@@ -139,20 +138,20 @@ namespace TailorManagementApp.Controllers
             }
             else
             {
-                foreach (var measurement in allMeasurements)
+                foreach (Measurement measurement in allMeasurements)
                 {
                     viewModel.Add(new AssignedMeasurements
                     {
                         MeasurementID = measurement.MeasurementID,
                         Name = measurement.Name,
-                        
+
                     });
                 }
                 ViewData["Measurements"] = viewModel;
             }
-               
-                
-               
+
+
+
         }
         // POST: Categories/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
@@ -166,13 +165,13 @@ namespace TailorManagementApp.Controllers
                 return NotFound();
 
             }
-            var categoryToUpdate = await _context.Categories
+            Category categoryToUpdate = await _context.Categories
                 .Include(i => i.Enrollments)
                  .ThenInclude(i => i.Measurement)
                 .FirstOrDefaultAsync(s => s.CategoryID == id);
             if (ModelState.IsValid)
             {
-             
+
                 if (await TryUpdateModelAsync<Category>(
                     categoryToUpdate,
                     "",
@@ -199,17 +198,17 @@ namespace TailorManagementApp.Controllers
         }
         private void UpdateCategoryMeasurements(string[] selectedMeasurements, Category categoryToUpdate)
         {
-           
+
             if (selectedMeasurements == null)
             {
                 categoryToUpdate.Enrollments = new List<CategoryMeasurement>();
                 return;
             }
 
-            var selectedMeasurementsHS = new HashSet<string>(selectedMeasurements);
-            var categoryMeasurements = new HashSet<int>
+            HashSet<string> selectedMeasurementsHS = new HashSet<string>(selectedMeasurements);
+            HashSet<int> categoryMeasurements = new HashSet<int>
                 (categoryToUpdate.Enrollments.Select(c => c.Measurement.MeasurementID));
-            foreach (var measurement in _context.Measurements)
+            foreach (Measurement measurement in _context.Measurements)
             {
                 if (selectedMeasurementsHS.Contains(measurement.MeasurementID.ToString()))
                 {
@@ -239,7 +238,7 @@ namespace TailorManagementApp.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            Category category = await _context.Categories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.CategoryID == id);
             if (category == null)
@@ -264,13 +263,13 @@ namespace TailorManagementApp.Controllers
                 .Include(i => i.Enrollments)
                 .SingleAsync(i => i.CategoryID == id);
 
-           
+
             _context.Categories.Remove(category);
 
             await _context.SaveChangesAsync();
             return Redirect("~/Categories/Index/");
         }
 
-       
+
     }
 }

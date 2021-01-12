@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Repositories;
 
@@ -12,14 +8,14 @@ namespace TailorApp.Application.Implementations
     public class CategoryService : ICategoryService
     {
 
-        private readonly ICustomerRepository _customerRepository;
-        public CategoryService(ICustomerRepository customerRepository)
+        private readonly ICategoryRepository _categoryRepository;
+        public CategoryService(ICategoryRepository customerRepository)
         {
-            _customerRepository = customerRepository;
+            _categoryRepository = customerRepository;
         }
-        public async Task<SelectList> GetSelectListAsync(int? selectedCategoryId)
+        public async Task<SelectList> GetSelectListAsync(int? selectedCategoryId = null)
         {
-            return await _customerRepository.GetSelectListAsync(selectedCategoryId);
+            return await _categoryRepository.GetSelectListAsync(selectedCategoryId);
         }
     }
 }

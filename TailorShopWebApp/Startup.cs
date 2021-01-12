@@ -5,12 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TailorApp.Application.Implementations;
-using TailorApp.Application.Services;
-using TailorApp.Domain.Repositories;
 using TailorApp.Infrastructure.Data;
-using TailorApp.Infrastructure.Data.Repositories;
-
+using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 
 namespace TailorShopWebApp
 {
@@ -36,10 +32,9 @@ namespace TailorShopWebApp
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            // Assemblies start with "Tailor" will only be scanned.
+            string[] assembliesToBeScanned = new string[] { "Tailor" };
+            services.AddServicesOfType<IScopedService>(assembliesToBeScanned);
 
             services.AddControllersWithViews();
             services.AddRazorPages();

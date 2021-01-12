@@ -14,7 +14,7 @@ namespace TailorApp.Application.Implementations
             _customerRepository = customerRepository;
         }
 
-        public async Task<SelectList> GetSelectListAsync(int? selectedCustomerId)
+        public async Task<SelectList> GetSelectListAsync(int? selectedCustomerId = null)
         {
             return await _customerRepository.GetSelectListAsync(selectedCustomerId);
         }

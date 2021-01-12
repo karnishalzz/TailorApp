@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 using TailorApp.Domain.Entities.Base;
 
 namespace TailorApp.Domain.Entities
@@ -27,7 +24,7 @@ namespace TailorApp.Domain.Entities
         public int CustomerID { get; set; }
 
         public virtual Customer Customer { get; set; }
-       
+
         public virtual List<OrderDetail> OrderDetails { get; set; }
     }
 }

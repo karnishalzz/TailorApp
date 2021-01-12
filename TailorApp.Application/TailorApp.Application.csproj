@@ -9,6 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="TanvirArjel.Extensions.Microsoft.DependencyInjection" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TailorApp.Domain\TailorApp.Domain.csproj" />
   </ItemGroup>
 

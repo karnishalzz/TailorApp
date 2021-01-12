@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 
 namespace TailorApp.Domain.Repositories
 {
-    public interface ICategoryRepository
+    public interface ICategoryRepository : IScopedService
     {
         Task<SelectList> GetSelectListAsync(int? selectedCategoryId);
     }

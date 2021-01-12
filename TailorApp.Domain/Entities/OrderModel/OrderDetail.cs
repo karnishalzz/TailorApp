@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using TailorApp.Domain.Entities.Base;
 
 namespace TailorApp.Domain.Entities
@@ -20,10 +15,10 @@ namespace TailorApp.Domain.Entities
 
         public int OrderID { get; set; }
         public int CategoryID { get; set; }
-        
-       
+
+
         public virtual Category Category { get; set; }
-     
+
         public virtual Order Order { get; set; }
 
         public ICollection<OrderDetalMeasurement> OrderDetalMeasurements { get; set; }

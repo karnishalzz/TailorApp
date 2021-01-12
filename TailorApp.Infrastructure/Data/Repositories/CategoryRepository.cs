@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using TailorApp.Domain.Repositories;
 
 namespace TailorApp.Infrastructure.Data.Repositories
@@ -16,9 +13,10 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
             _context = context;
         }
+
         public async Task<SelectList> GetSelectListAsync(int? selectedCategoryId)
         {
-            var categoryList =await _context.Categories
+            var categoryList = await _context.Categories
                  .Select(x => new { x.CategoryID, x.Name })
                  .OrderBy(x => x.Name)
                  .ToListAsync();
