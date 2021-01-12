@@ -11,6 +11,7 @@ using TailorApp.Domain.Repositories;
 using TailorApp.Infrastructure.Data;
 using TailorApp.Infrastructure.Data.Repositories;
 
+
 namespace TailorShopWebApp
 {
     public class Startup
@@ -37,6 +38,8 @@ namespace TailorShopWebApp
 
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

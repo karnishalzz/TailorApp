@@ -20,17 +20,19 @@ namespace TailorManagementApp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICustomerService _customerService;
-
+        private readonly ICategoryService _categoryService;
         public OrdersController(
             ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
-            ICustomerService customerService)
+            ICustomerService customerService,
+            ICategoryService categoryService)
         {
 
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             _customerService = customerService;
+            _categoryService = categoryService;
         }
 
         [Authorize(Roles = "Admin,Manager")]
@@ -89,18 +91,7 @@ namespace TailorManagementApp.Controllers
 
             return View(order);
         }
-        private void PopulateCategoryDropDownList(object selectedCategory = null)
-        {
-            IOrderedQueryable<Category> categoriesQuery = from d in _context.Categories
-                                                          orderby d.Name
-                                                          select d;
-            ViewBag.CategoryID = new SelectList(categoriesQuery.AsNoTracking(), "CategoryID", "Name", selectedCategory);
-        }
-        private async Task PopulateCustomerDropDownList(int? selectedCategory = null)
-        {
-            SelectList customerSelectList = await _customerService.GetSelectListAsync(selectedCategory);
-            ViewBag.CustomerID = customerSelectList;
-        }
+        
 
 
         [HttpGet]
@@ -326,6 +317,19 @@ namespace TailorManagementApp.Controllers
 
             ReportResult result = localReport.Execute(RenderType.Pdf, ext, parameters, mimtype);
             return File(result.MainStream, "application/pdf");
+        }
+
+
+        //private methods
+        private async Task PopulateCategoryDropDownList(int? selectedCategory = null)
+        {
+            SelectList categorySelectList = await _categoryService.GetSelectListAsync(selectedCategory);
+            ViewBag.CategoryID = categorySelectList;
+        }
+        private async Task PopulateCustomerDropDownList(int? selectedCustomer = null)
+        {
+            SelectList customerSelectList = await _customerService.GetSelectListAsync(selectedCustomer);
+            ViewBag.CustomerID = customerSelectList;
         }
     }
 }
