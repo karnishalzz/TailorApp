@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
-using TailorApp.Infrastructure.Data;
 
 namespace TailorManagementApp.Controllers
 {
@@ -23,10 +20,18 @@ namespace TailorManagementApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _measurementService.GetListAsync());
+            return View();
         }
+
+        [HttpPost]
+        public async Task<JsonResult> LoadMeasurementList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _measurementService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
@@ -35,7 +40,8 @@ namespace TailorManagementApp.Controllers
             {
                 return NotFound();
             }
-            var measurement =await _measurementService.GetByIdAsync(id);
+
+            Measurement measurement = await _measurementService.GetByIdAsync(id);
 
             if (measurement == null)
             {
@@ -63,11 +69,11 @@ namespace TailorManagementApp.Controllers
                     await _measurementService.CreateAsync(measurement);
                     return Redirect("~/Measurements/Index/");
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     throw;
                 }
-                
+
             }
             return PartialView(measurement);
         }
@@ -80,7 +86,7 @@ namespace TailorManagementApp.Controllers
                 return NotFound();
             }
 
-            var measurement =await _measurementService.FindByIdAsync(id);
+            Measurement measurement = await _measurementService.FindByIdAsync(id);
             if (measurement == null)
             {
                 return NotFound();
@@ -88,7 +94,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(measurement);
         }
 
-  
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MeasurementID,Name,Description")] Measurement measurement)
@@ -116,7 +122,7 @@ namespace TailorManagementApp.Controllers
                         throw;
                     }
                 }
-                
+
             }
             return PartialView(measurement);
         }
@@ -129,7 +135,7 @@ namespace TailorManagementApp.Controllers
                 return NotFound();
             }
 
-            var measurement = await _measurementService.FindByIdAsync(id);
+            Measurement measurement = await _measurementService.FindByIdAsync(id);
             if (measurement == null)
             {
                 return NotFound();
@@ -138,7 +144,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(measurement);
         }
 
-     
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -148,10 +154,10 @@ namespace TailorManagementApp.Controllers
                 await _measurementService.DeleteAsync(id);
                 return Redirect("~/Measurements/Index/");
             }
-            catch (Exception) { throw;  }
-            
+            catch (Exception) { throw; }
+
         }
 
-        
+
     }
 }

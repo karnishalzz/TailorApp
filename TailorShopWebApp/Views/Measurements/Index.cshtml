@@ -4,75 +4,131 @@
     ViewData["Title"] = "Measuremet";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-block">
-                    <div id="placeHolder"></div>
+<style>
+    .dataTables_filter {
+        display: none;
+    }
 
-                    <div class="col-lg-12">
-                        <b><i class="ti-tag"></i> <span>Measurement List</span></b>
-                        <a class="btn btn-success" style="margin-bottom:12px;float:right;" data-toggle="ajax-modal" id="MeasurementButton" data-target="#measurementModal" data-url="@Url.Action("Create")"><i class="ti-plus"></i>Create New</a>
-                    </div>
-                    <br />
-                    <hr />
-                    <div class="dt-responsive table-responsive">
-                        <table class="table table-striped table-bordered" style="width:100%" id="measurementTable">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Name)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Description)
-                                    </th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Description)
-                                        </td>
-                                        <td>
-                                            <a data-toggle="ajax-modal" id="MeasurementButton" data-target="#measurementModal" data-url="@Url.Action($"Edit/{item.MeasurementID}")"><i class="ti-pencil"></i></a>|
-                                            @*<a asp-action="Edit" asp-route-id="@item.MeasurementID"><i class="ti-pencil"></i></a> |*@
-                                            <a data-toggle="ajax-modal" id="delete" data-target="#measurementModal" data-url="@Url.Action($"Details/{item.MeasurementID}")"><i class="ti-list"></i></a> |
-                                            <a data-toggle="ajax-modal" id="delete" data-target="#measurementModal" data-url="@Url.Action($"Delete/{item.MeasurementID}")"><i class="ti-trash"></i></a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    </div>
-                </div></div></div>
-                    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
 
-                    @section scripts{
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-block">
+                <div id="placeHolder"></div>
 
-                        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
-                        <script type="text/javascript" src="~/js/Popup.js"></script>
-                        <script>
+                <div class="col-lg-12">
+                    <b><i class="ti-tag"></i> <span>Measurement List</span></b>
+                    <a class="btn btn-success" style="margin-bottom:12px;float:right;" data-toggle="ajax-modal" id="MeasurementButton" data-target="#measurementModal" data-url="@Url.Action("Create")"><i class="ti-plus"></i>Create New</a>
+                </div>
+                <br />
+                <hr />
+                <div class="dt-responsive table-responsive">
+                    <table class="table table-striped table-bordered" style="width:100%" id="measurementTable">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.MeasurementID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Description)
+                                </th>
+                                <th>Action</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.MeasurementID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Description)
+                                </th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                            $(document).ready(function () {
-                                $('#measurementTable').DataTable({
-                                    "paging": true,
-                                    "ordering": true,
-                                    "info": true
-                                });
-                            });
+@section scripts{
 
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="~/js/Popup.js"></script>
+    <script>
 
+        $(document).ready(function () {
 
+            jQuery('#measurementTable thead tr:eq(0) th:not(:last,:first,:nth-child(4))').each(function () {
+                    var title = jQuery(this).text();
+                    jQuery(this).html('<input class="form-control" type="text" placeholder="Search ' + title + '" />');
+                });
 
-                        </script>
-
+            var mesaurementTable = $("#measurementTable").DataTable({
+                'processing': true,
+                'serverSide': true,
+                "order": [[0, 'desc']],
+                'ajax': {
+                    'url': '@Url.Action("LoadMeasurementList", "Measurements")',
+                    'method': 'POST',
+                    'contentType': 'application/json',
+                    'data': function (d) {
+                        return JSON.stringify(d);
                     }
+                },
+                "lengthMenu": [[10, 15], [10, 15]],
+                "lengthChange": true,
+                "searching": true,
+                "scrollX": true,
+                //fixedColumns: {
+                //    leftColumns: 1,
+                //    rightColumns: 1
+                //},
+                'columns': [
+                    {
+                        data: "measurementID", name: "MeasurementID",
+                    },
+
+                    { data: "name", name: "Name" },
+                    { data: "description", name: "Description" },
+                    {
+                        data: "measurementID", name: "MeasurementID", searchable: false,
+                        render: function (data, type, row, meta) {
+                            return '<a target="_blank" style="color: purple;font-weight: bold;" class ="btn btn-primary btn-sm" href="/learner/profile/'+ row.measurementID +'">'+"Edit"+'</a>';
+
+                        }
+                    },
+                ]
+            });
+
+            // Individual Column Searching In case of Some Fixed Column
+            jQuery(document).on('focusout', '#measurementTable_wrapper thead input[type="text"]', function () {
+                mesaurementTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+
+
+            // Select List filtering
+
+            jQuery(mesaurementTable.table().container()).on('change', 'thead select', function () {
+                console.log(this.value);
+                mesaurementTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+    </script>
+
+}
 
 

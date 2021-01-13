@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Repositories;
 
@@ -17,6 +14,8 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
             _context = context;
         }
+
+        public IQueryable<Measurement> Measurements => _context.Measurements.AsQueryable();
 
         public async Task<List<Measurement>> GetListAsync()
         {
@@ -36,6 +35,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
             return await _context.Measurements.FindAsync(id);
         }
+
         public async Task CreateAsync(Measurement measurement)
         {
             _context.Measurements.Add(measurement);
@@ -50,7 +50,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var item =await FindByIdAsync(id);
+            Measurement item = await FindByIdAsync(id);
             _context.Measurements.Remove(item);
             await _context.SaveChangesAsync();
         }

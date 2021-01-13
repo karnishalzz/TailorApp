@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Domain.Entities;
 using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 
@@ -17,5 +18,6 @@ namespace TailorApp.Application.Services
         Task CreateAsync(Measurement measurement);
         Task UpdateAsync(Measurement measurement);
         Task DeleteAsync(int id);
+        Task<object> GetDataTableAsync(DataTableDto dataTableDto);
     }
 }
