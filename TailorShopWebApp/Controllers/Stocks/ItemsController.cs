@@ -30,13 +30,13 @@ namespace TailorManagementApp.Controllers.StockController
         }
 
 
-        // GET: Items
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Items.ToListAsync());
         }
 
-        // GET: Items/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -54,19 +54,18 @@ namespace TailorManagementApp.Controllers.StockController
             return PartialView(item);
         }
 
-        // GET: Items/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+        [HttpGet]
         public IActionResult CreateModal()
         {
             return PartialView();
         }
 
-        // POST: Items/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ItemID,Name,Unit,Description,ImageUpload")] Item item)
@@ -98,7 +97,7 @@ namespace TailorManagementApp.Controllers.StockController
 
         }
 
-        // GET: Items/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -114,9 +113,7 @@ namespace TailorManagementApp.Controllers.StockController
             return View(item);
         }
 
-        // POST: Items/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ItemID,Name,Unit,Description,ImageUpload")] Item item)
@@ -187,7 +184,7 @@ namespace TailorManagementApp.Controllers.StockController
             return Redirect("~/Items/Index/");
         }
 
-        // GET: Items/Delete/5
+       [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -205,7 +202,6 @@ namespace TailorManagementApp.Controllers.StockController
             return PartialView(item);
         }
 
-        // POST: Items/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -24,7 +24,7 @@ namespace TailorManagementApp.Controllers
             _categoryService = categoryService;
         }
 
-        // GET: Categories
+        [HttpGet]
         public async Task<IActionResult> Index(int? id)
         {
             CategoryViewModel viewModel = new CategoryViewModel
@@ -51,7 +51,7 @@ namespace TailorManagementApp.Controllers
 
 
 
-        // GET: Categories/Create
+        [HttpGet]
         public IActionResult Create()
         {
             Category category = new Category();
@@ -59,9 +59,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(category);
         }
 
-        // POST: Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Enrollments,Description")] Category category, string[] selectedMeasurements)
@@ -97,7 +95,7 @@ namespace TailorManagementApp.Controllers
 
         }
 
-        // GET: Categories/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -118,44 +116,8 @@ namespace TailorManagementApp.Controllers
             PopulateAssignedMeasurement(category);
             return PartialView(category);
         }
-        private void PopulateAssignedMeasurement(Category category)
-        {
-            DbSet<Measurement> allMeasurements = _context.Measurements;
-            List<AssignedMeasurements> viewModel = new List<AssignedMeasurements>();
-            if (category.CategoryID != 0)
-            {
-                HashSet<int> categoryMeasurements = new HashSet<int>(category.Enrollments.Select(c => c.MeasurementID));
-                foreach (Measurement measurement in allMeasurements)
-                {
-                    viewModel.Add(new AssignedMeasurements
-                    {
-                        MeasurementID = measurement.MeasurementID,
-                        Name = measurement.Name,
-                        Assigned = categoryMeasurements.Contains(measurement.MeasurementID)
-                    });
-                }
-                ViewData["Measurements"] = viewModel;
-            }
-            else
-            {
-                foreach (Measurement measurement in allMeasurements)
-                {
-                    viewModel.Add(new AssignedMeasurements
-                    {
-                        MeasurementID = measurement.MeasurementID,
-                        Name = measurement.Name,
-
-                    });
-                }
-                ViewData["Measurements"] = viewModel;
-            }
 
 
-
-        }
-        // POST: Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int? id, string[] selectedMeasurements)
@@ -196,6 +158,85 @@ namespace TailorManagementApp.Controllers
             PopulateAssignedMeasurement(categoryToUpdate);
             return PartialView(categoryToUpdate);
         }
+
+
+
+       [HttpGet]
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Category category = await _context.Categories
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.CategoryID == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                    "Delete failed. Try again, and if the problem persists " +
+                    "see your system administrator.";
+            }
+            return PartialView(category);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            Category category = await _context.Categories
+                .Include(i => i.Enrollments)
+                .SingleAsync(i => i.CategoryID == id);
+
+
+            _context.Categories.Remove(category);
+
+            await _context.SaveChangesAsync();
+            return Redirect("~/Categories/Index/");
+        }
+        //private methods
+        private void PopulateAssignedMeasurement(Category category)
+        {
+            DbSet<Measurement> allMeasurements = _context.Measurements;
+            List<AssignedMeasurements> viewModel = new List<AssignedMeasurements>();
+            if (category.CategoryID != 0)
+            {
+                HashSet<int> categoryMeasurements = new HashSet<int>(category.Enrollments.Select(c => c.MeasurementID));
+                foreach (Measurement measurement in allMeasurements)
+                {
+                    viewModel.Add(new AssignedMeasurements
+                    {
+                        MeasurementID = measurement.MeasurementID,
+                        Name = measurement.Name,
+                        Assigned = categoryMeasurements.Contains(measurement.MeasurementID)
+                    });
+                }
+                ViewData["Measurements"] = viewModel;
+            }
+            else
+            {
+                foreach (Measurement measurement in allMeasurements)
+                {
+                    viewModel.Add(new AssignedMeasurements
+                    {
+                        MeasurementID = measurement.MeasurementID,
+                        Name = measurement.Name,
+
+                    });
+                }
+                ViewData["Measurements"] = viewModel;
+            }
+
+
+
+        }
+
         private void UpdateCategoryMeasurements(string[] selectedMeasurements, Category categoryToUpdate)
         {
 
@@ -227,49 +268,8 @@ namespace TailorManagementApp.Controllers
                     }
                 }
             }
+
         }
-
-        // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
-        {
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Category category = await _context.Categories
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.CategoryID == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            if (saveChangesError.GetValueOrDefault())
-            {
-                ViewData["ErrorMessage"] =
-                    "Delete failed. Try again, and if the problem persists " +
-                    "see your system administrator.";
-            }
-            return PartialView(category);
-        }
-
-        // POST: Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            Category category = await _context.Categories
-                .Include(i => i.Enrollments)
-                .SingleAsync(i => i.CategoryID == id);
-
-
-            _context.Categories.Remove(category);
-
-            await _context.SaveChangesAsync();
-            return Redirect("~/Categories/Index/");
-        }
-
 
     }
 }

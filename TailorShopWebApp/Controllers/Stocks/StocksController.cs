@@ -22,7 +22,7 @@ namespace TailorManagementApp.Controllers.Stocks
             _context = context;
         }
 
-        // GET: Stocks
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var stock =await _context.Stocks
@@ -33,7 +33,7 @@ namespace TailorManagementApp.Controllers.Stocks
             return View(stock);
         }
 
-        // GET: Stocks/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -54,16 +54,14 @@ namespace TailorManagementApp.Controllers.Stocks
             return View(stock);
         }
 
-        // GET: Stocks/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewData["ItemID"] = new SelectList(_context.Items, "ItemID", "Name");
             return View();
         }
 
-        // POST: Stocks/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+     
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StockID,ItemID,InitialQuantity,CostPrice,SellingPrice")] Stock stock)
@@ -81,7 +79,8 @@ namespace TailorManagementApp.Controllers.Stocks
             return View(stock);
         }
 
-        // GET: Stocks/Edit/5
+        
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -98,9 +97,7 @@ namespace TailorManagementApp.Controllers.Stocks
             return View(stock);
         }
 
-        // POST: Stocks/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("StockID,ItemID,InitialQuantity,Quantity,CostPrice,SellingPrice")] Stock stock)
@@ -135,7 +132,7 @@ namespace TailorManagementApp.Controllers.Stocks
             return View(stock);
         }
 
-        // GET: Stocks/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -154,7 +151,6 @@ namespace TailorManagementApp.Controllers.Stocks
             return View(stock);
         }
 
-        // POST: Stocks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

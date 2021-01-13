@@ -21,13 +21,13 @@ namespace TailorManagementApp.Controllers
             _context = context;
         }
 
-        // GET: Expenses
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Expenses.ToListAsync());
         }
 
-        // GET: Expenses/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
 
@@ -45,15 +45,13 @@ namespace TailorManagementApp.Controllers
             return View(expense);
         }
 
-        // GET: Expenses/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return PartialView();
         }
 
-        // POST: Expenses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ExpenseID,Type,Price,Description")] Expense expense)
@@ -68,7 +66,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(expense);
         }
 
-        // GET: Expenses/Edit/5
+       [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,9 +82,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(expense);
         }
 
-        // POST: Expenses/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ExpenseID,Type,Price,Description")] Expense expense)
@@ -120,7 +116,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(expense);
         }
 
-        // GET: Expenses/Delete/5
+       [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -138,7 +134,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(expense);
         }
 
-        // POST: Expenses/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

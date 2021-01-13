@@ -29,14 +29,14 @@ namespace TailorManagementApp.Controllers
             _env = env;
         }
 
-        // GET: Customers
+        [HttpGet]
 
         public async Task<IActionResult> Index()
         {
             return View(await _context.Customers.ToListAsync());
         }
 
-        // GET: Customers/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -54,7 +54,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(customer);
         }
 
-        // GET: Customers/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -65,9 +65,6 @@ namespace TailorManagementApp.Controllers
             return PartialView();
         }
 
-        // POST: Customers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Phone,Address,ImageUpload")] Customer customer)
@@ -100,7 +97,7 @@ namespace TailorManagementApp.Controllers
 
         }
 
-        // GET: Customers/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -116,9 +113,6 @@ namespace TailorManagementApp.Controllers
             return View(customer);
         }
 
-        // POST: Customers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
 
         public async Task<IActionResult> Edit(int id, [Bind("CustomerID,Name,Phone,Address,ImageUpload")] Customer customer)
@@ -193,7 +187,7 @@ namespace TailorManagementApp.Controllers
 
         }
 
-        // GET: Customers/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -211,7 +205,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(customer);
         }
 
-        // POST: Customers/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -221,11 +215,6 @@ namespace TailorManagementApp.Controllers
             _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + custommer.ImagePath);
             await _context.SaveChangesAsync();
             return Redirect("~/Customers/Index/");
-        }
-
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.CustomerID == id);
         }
 
         [HttpPost]
@@ -256,6 +245,9 @@ namespace TailorManagementApp.Controllers
             ViewBag.Count = count;
             return Redirect("../Customers/Index/");
         }
+
+        //private methods
+
         private async Task<bool> SendSms(string phone, string msg)
         {
             try
@@ -280,5 +272,11 @@ namespace TailorManagementApp.Controllers
             }
 
         }
+
+        private bool CustomerExists(int id)
+        {
+            return _context.Customers.Any(e => e.CustomerID == id);
+        }
+
     }
 }

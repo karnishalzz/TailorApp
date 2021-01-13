@@ -27,14 +27,14 @@ namespace TailorManagementApp.Controllers
             _env = env;
         }
 
-        // GET: Products
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var categoryList = _context.Products.Include(p => p.Category);
             return View(await categoryList.ToListAsync());
         }
 
-        // GET: Products/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -54,16 +54,14 @@ namespace TailorManagementApp.Controllers
             return PartialView(product);
         }
 
-        // GET: Products/Create
+        [HttpGet]
         public IActionResult Create()
         {
             PopulateCategorysDropDownList();
             return View();
         }
 
-        // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,CategoryID,ImageUpload")] Product product)
@@ -98,7 +96,7 @@ namespace TailorManagementApp.Controllers
 
         }
 
-        // GET: Products/Edit/5
+        [HttpGet]
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -118,9 +116,6 @@ namespace TailorManagementApp.Controllers
             return View(product);
         }
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPost(int id, [Bind("ProductID,Name,Description,CategoryID,ImageUpload")] Product product)
@@ -191,7 +186,7 @@ namespace TailorManagementApp.Controllers
 
         }
 
-        // GET: Products/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -211,7 +206,6 @@ namespace TailorManagementApp.Controllers
             return PartialView(product);
         }
 
-        // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -226,6 +220,9 @@ namespace TailorManagementApp.Controllers
             return Redirect("~/Products/Index/");
         }
 
+
+
+        //private methods
         private bool ProductExists(int id)
         {
             return _context.Products.Any(e => e.ProductID == id);

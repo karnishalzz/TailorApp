@@ -22,11 +22,14 @@ namespace TailorManagementApp.Controllers.Rent
             _context = context;
         }
         [Authorize]
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
             return View(await _context.RentReturns.ToListAsync());
         }
+
         [Authorize(Roles = "Admin,Manager")]
+        [HttpGet]
         public async Task<ActionResult> ReturnDetails(int id)
         {
             var returnDetails = await _context.RentReturns
@@ -36,7 +39,9 @@ namespace TailorManagementApp.Controllers.Rent
                 .FirstOrDefaultAsync();
             return PartialView(returnDetails);
         }
+
         [Authorize(Roles = "Admin,Manager")]
+        [HttpGet]
         public async Task<IActionResult> Returns(int id)
         {
             r.Rent model = await _context.Rents
@@ -54,12 +59,6 @@ namespace TailorManagementApp.Controllers.Rent
             return View(model);
         }
 
-        /// <summary>
-        /// Save all the returned items 
-        /// </summary>
-        /// <param name="coll"></param>
-        /// <returns></returns>
-        //POST : 
         [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         public async Task<JsonResult> ReturnItems(IFormCollection coll)
@@ -142,6 +141,9 @@ namespace TailorManagementApp.Controllers.Rent
             return new JsonResult(new { Data = new { status = status, message = "Error !" } });
 
         }
+
+
+        //private methods
         private void UpdateRent(int rentID, decimal price)
         {
             var rent = _context.Rents.Where(x => x.RentID == rentID).FirstOrDefault();

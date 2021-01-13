@@ -24,31 +24,14 @@ namespace TailorManagementApp.Controllers.PurchaseController
         {
             _context = context;
         }
-        // GET: PurchaseEntries
+       [HttpGet]
         public ActionResult Index()
         {
             PopulateSupplierDropDownList();
             PopulateItemDropDownList();
             return View();
         }
-        private void PopulateSupplierDropDownList(object selectedSupplier = null)
-        {
-            var suppliersQuery = from d in _context.Suppliers
-                                  orderby d.Name
-                                  select d;
-            ViewBag.SupplierID = new SelectList(suppliersQuery.AsNoTracking(), "SupplierID", "Name", selectedSupplier);
-        }
-
-        private void PopulateItemDropDownList(object selectedItem = null)
-        {
-            var itemQuery = from d in _context.Items
-                                 orderby d.Name
-                                 select d;
-            ViewBag.ItemID = new SelectList(itemQuery.AsNoTracking(), "ItemID", "Name", selectedItem);
-        }
-
-
-
+        
         [HttpPost]
         public async Task<JsonResult> SavePurchaseEntryAsync(PurchaseEntryViewModel p)
         {
@@ -109,6 +92,8 @@ namespace TailorManagementApp.Controllers.PurchaseController
             // return the status in form of Json
             return new JsonResult(new { Data = new { status = status } });
         }
+
+        [HttpPost]
         public void InsertOrUpdateInventory(PurchaseDetail purchaseDetail)
         {
             var _stock = new Stock();
@@ -166,6 +151,11 @@ namespace TailorManagementApp.Controllers.PurchaseController
                     }
                 }
             }
+
+
+
+        //private methods
+
         private void UpdateExpense(decimal total, int purchaseID)
         {
             Expense expense = new Expense()
@@ -179,6 +169,21 @@ namespace TailorManagementApp.Controllers.PurchaseController
 
             _context.Expenses.Add(expense);
             _context.SaveChanges();
+        }
+        private void PopulateSupplierDropDownList(object selectedSupplier = null)
+        {
+            var suppliersQuery = from d in _context.Suppliers
+                                 orderby d.Name
+                                 select d;
+            ViewBag.SupplierID = new SelectList(suppliersQuery.AsNoTracking(), "SupplierID", "Name", selectedSupplier);
+        }
+
+        private void PopulateItemDropDownList(object selectedItem = null)
+        {
+            var itemQuery = from d in _context.Items
+                            orderby d.Name
+                            select d;
+            ViewBag.ItemID = new SelectList(itemQuery.AsNoTracking(), "ItemID", "Name", selectedItem);
         }
     }
     

@@ -25,7 +25,7 @@ namespace TailorManagementApp.Controllers
             _signInManager = signInManager;
         }
 
-       
+       [HttpGet]
         public IActionResult Index()
         {
             if (!_signInManager.IsSignedIn(User)) //verify if it's logged

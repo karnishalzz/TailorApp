@@ -22,13 +22,13 @@ namespace TailorManagementApp.Controllers.Sale
             _context = context;
         }
 
-        // GET: Sales
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Sales.ToListAsync());
         }
 
-        // GET: Sales/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             var model = await _context.Sales
@@ -46,29 +46,7 @@ namespace TailorManagementApp.Controllers.Sale
             return View(model);
         }
 
-        //// GET: Sales/Create
-        //public IActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        //// POST: Sales/Create
-        //// To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        //// more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("SalesID,Date,Amount,Discount,Tax,GrandTotal,Remarks")] Sales sales)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(sales);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(sales);
-        //}
-
-        // GET: Sales/Edit/5
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -85,9 +63,7 @@ namespace TailorManagementApp.Controllers.Sale
             return View(sales);
         }
 
-        // POST: Sales/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -120,35 +96,6 @@ namespace TailorManagementApp.Controllers.Sale
             }
             return View(sales);
         }
-
-        //// GET: Sales/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var sales = await _context.Sales
-        //        .FirstOrDefaultAsync(m => m.SalesID == id);
-        //    if (sales == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(sales);
-        //}
-
-        //// POST: Sales/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var sales = await _context.Sales.FindAsync(id);
-        //    _context.Sales.Remove(sales);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
 
         private bool SalesExists(int id)
         {

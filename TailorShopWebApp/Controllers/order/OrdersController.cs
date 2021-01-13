@@ -49,6 +49,7 @@ namespace TailorManagementApp.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         public async Task<IActionResult> ViewOrder()
         {
             List<Order> model = await _context.Orders
@@ -74,6 +75,8 @@ namespace TailorManagementApp.Controllers
             return View(orderList);
         }
 
+        //updates ony delivery status and payment
+        [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -99,7 +102,6 @@ namespace TailorManagementApp.Controllers
 
             return View(order);
         }
-
 
 
         [HttpGet]
@@ -151,6 +153,38 @@ namespace TailorManagementApp.Controllers
             return new JsonResult(new { Data = new { status = status, message = "Error !" } });
         }
 
+        
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> EditOrderMeasurements(OrderDetalMeasurement orderDetalMeasurement)
+        {
+            OrderDetalMeasurement orderDetalMeasurementTobeUpdated = await _context.OrderDetalMeasurements
+                .Where(x => x.OrderDetailID == orderDetalMeasurement.OrderDetailID &&
+                x.MeasurementID == orderDetalMeasurement.MeasurementID)
+                .FirstOrDefaultAsync();
+            orderDetalMeasurementTobeUpdated.MeasurementValue = orderDetalMeasurement.MeasurementValue;
+            _context.Update(orderDetalMeasurementTobeUpdated);
+            _context.SaveChanges();
+            return Redirect("../Orders/ViewOrderDetails/" + orderDetalMeasurement.OrderDetailID);
+        }
+        
+        [Authorize]
+        [HttpGet]
+        public IActionResult OrderInvoice(int id)
+        {
+            Order order = _context.Orders.Where(x => x.OrderID == id)
+                .Include(o => o.Customer)
+                .Include(o => o.OrderDetails)
+                .ThenInclude(o => o.Category)
+                .AsNoTracking()
+                .First();
+            return View(order);
+        }
+        
+
+
+        //private methods for internal function implemations 
+
         private decimal _Total;
         private decimal _Paid;
         [Authorize(Roles = "Admin,Manager")]
@@ -199,26 +233,14 @@ namespace TailorManagementApp.Controllers
                 return true;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw; // Never use throw ex. use only throw.
             }
 
 
         }
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> EditOrderMeasurements(OrderDetalMeasurement orderDetalMeasurement)
-        {
-            OrderDetalMeasurement orderDetalMeasurementTobeUpdated = await _context.OrderDetalMeasurements
-                .Where(x => x.OrderDetailID == orderDetalMeasurement.OrderDetailID &&
-                x.MeasurementID == orderDetalMeasurement.MeasurementID)
-                .FirstOrDefaultAsync();
-            orderDetalMeasurementTobeUpdated.MeasurementValue = orderDetalMeasurement.MeasurementValue;
-            _context.Update(orderDetalMeasurementTobeUpdated);
-            _context.SaveChanges();
-            return Redirect("../Orders/ViewOrderDetails/" + orderDetalMeasurement.OrderDetailID);
-        }
+
         private void UpdateOrder(decimal total, decimal paid, int orderID)
         {
             Order order = _context.Orders.Find(orderID);
@@ -250,18 +272,8 @@ namespace TailorManagementApp.Controllers
             _context.Update(income);
             _context.SaveChanges();
         }
-        [Authorize]
-        [HttpGet]
-        public IActionResult OrderInvoice(int id)
-        {
-            Order order = _context.Orders.Where(x => x.OrderID == id)
-                .Include(o => o.Customer)
-                .Include(o => o.OrderDetails)
-                .ThenInclude(o => o.Category)
-                .AsNoTracking()
-                .First();
-            return View(order);
-        }
+
+        //To print order invoice
         public IActionResult Print(int id)
         {
             List<InvoiceOrder> invoiceOrders = new List<InvoiceOrder>();

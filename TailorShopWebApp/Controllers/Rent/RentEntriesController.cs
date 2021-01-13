@@ -24,7 +24,7 @@ namespace TailorManagementApp.Controllers.Rent
         {
             _context = context;
         }
-
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             PopulateCustomerDropDownList();
@@ -36,14 +36,7 @@ namespace TailorManagementApp.Controllers.Rent
                 .ToListAsync();
             return View(stock);
         }
-        private void PopulateCustomerDropDownList(object selectedCategory = null)
-        {
-            var customersQuery = from d in _context.Customers
-                                 orderby d.Name
-                                 select d;
-            ViewBag.CustomerID = new SelectList(customersQuery.AsNoTracking(), "CustomerID", "Name", selectedCategory);
-        }
-
+        
         [HttpPost]
         public JsonResult SerializeFormData(IFormCollection _collection)
         {
@@ -97,7 +90,13 @@ namespace TailorManagementApp.Controllers.Rent
             }
             return Json("null");
         }
-        public void InsertRentItem(int _rentID, string[] _stockID, string[] _qty, string[] _rate, string[] _amt)
+
+
+
+
+        //private methods
+
+        private void InsertRentItem(int _rentID, string[] _stockID, string[] _qty, string[] _rate, string[] _amt)
         {
             int count = _stockID.Count();
             for (int i = 0; i < count; i++)
@@ -107,7 +106,7 @@ namespace TailorManagementApp.Controllers.Rent
 
                 _rentItem.StockID = Convert.ToInt32(_stockID[i]);
                 _rentItem.Rate = Convert.ToDecimal(_rate[i]);
-               _rentItem.Quantity = Convert.ToInt32(_qty[i]);
+                _rentItem.Quantity = Convert.ToInt32(_qty[i]);
                 _rentItem.Amount = Convert.ToDecimal(_amt[i]);
                 _rentItem.ReturnQuantity = _rentItem.Quantity;
                 _context.RentDetails.Add(_rentItem);
@@ -115,7 +114,7 @@ namespace TailorManagementApp.Controllers.Rent
             }
         }
 
-        public void UpdateStock(string[] _stockID, string[] _qty)
+        private void UpdateStock(string[] _stockID, string[] _qty)
         {
             for (int i = 0, y = _stockID.Count(); i < y; i++)
             {
@@ -141,5 +140,13 @@ namespace TailorManagementApp.Controllers.Rent
             _context.Incomes.Add(income);
             _context.SaveChanges();
         }
+        private void PopulateCustomerDropDownList(object selectedCategory = null)
+        {
+            var customersQuery = from d in _context.Customers
+                                 orderby d.Name
+                                 select d;
+            ViewBag.CustomerID = new SelectList(customersQuery.AsNoTracking(), "CustomerID", "Name", selectedCategory);
+        }
+
     }
 }

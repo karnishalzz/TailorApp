@@ -22,7 +22,7 @@ namespace TailorManagementApp.Controllers.Sale
         {
             _context = context;
         }
-
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             List<Stock> stock = await _context.Stocks
@@ -32,6 +32,7 @@ namespace TailorManagementApp.Controllers.Sale
                 .ToListAsync();
             return View(stock);
         }
+
         [HttpPost]
         public JsonResult SerializeFormData(IFormCollection _collection)
         {
@@ -76,6 +77,11 @@ namespace TailorManagementApp.Controllers.Sale
             }
             return Json("null");
         }
+
+
+
+        //private methods
+
         private void InsertSalesItem(int _salesID, string[] _stockID, string[] _qty, string[] _rate, string[] _amt)
         {
             int count = _stockID.Count();

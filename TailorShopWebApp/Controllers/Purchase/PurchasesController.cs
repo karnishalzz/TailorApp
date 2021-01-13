@@ -22,14 +22,14 @@ namespace TailorManagementApp.Controllers.StockController
             _context = context;
         }
 
-        // GET: Purchases
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Purchases.Include(p => p.Supplier);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Purchases/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -49,32 +49,7 @@ namespace TailorManagementApp.Controllers.StockController
 
             return View(purchase);
         }
-
-        // GET: Purchases/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["SupplierID"] = new SelectList(_context.Suppliers, "ID", "Name");
-        //    return View();
-        //}
-
-        //// POST: Purchases/Create
-        //// To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        //// more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("PurchaseID,Date,SupplierID,Amount,Discount,Tax,GrandTotal,IsPaid,LastUpdated,Description")] Purchase purchase)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(purchase);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["SupplierID"] = new SelectList(_context.Suppliers, "ID", "Name", purchase.SupplierID);
-        //    return View(purchase);
-        //}
-
-        // GET: Purchases/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if ( id == null)
@@ -96,9 +71,7 @@ namespace TailorManagementApp.Controllers.StockController
             return PartialView("Edit",purchase);
         }
         
-        // POST: Purchases/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("PurchaseDetailID,PurchaseID,Quantity,CostPrice,SellingPrice,Category")] PurchaseDetail purchaseDetail)
@@ -138,40 +111,7 @@ namespace TailorManagementApp.Controllers.StockController
      
         }
 
-        // GET: Purchases/Delete/5
-        //public async Task<IActionResult> Delete(int?   id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var purchase = await _context.Purchases
-        //        .Include(p => p.Supplier)
-        //        .FirstOrDefaultAsync(m => m.PurchaseID == id);
-        //    if (purchase == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(purchase);
-        //}
-
-        //// POST: Purchases/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(string id)
-        //{
-        //    var purchase = await _context.Purchases.FindAsync(id);
-        //    _context.Purchases.Remove(purchase);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        private bool PurchaseExists(int id)
-        {
-            return _context.Purchases.Any(e => e.PurchaseID == id);
-        }
+      
         private bool PurchaseDetailExists(int id)
         {
             return _context.PurchaseDetails.Any(e => e.PurchaseDetailID == id);

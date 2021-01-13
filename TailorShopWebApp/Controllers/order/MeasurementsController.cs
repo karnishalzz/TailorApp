@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
 
@@ -14,29 +15,28 @@ namespace TailorManagementApp.Controllers
     [Authorize]
     public class MeasurementsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMeasurementService _measurementService;
 
-        public MeasurementsController(ApplicationDbContext context)
+        public MeasurementsController(IMeasurementService measurementService)
         {
-            _context = context;
+            _measurementService = measurementService;
         }
 
-        // GET: Measurements
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Measurements.ToListAsync());
+            return View(await _measurementService.GetListAsync());
         }
 
-        // GET: Measurements/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+            var measurement =await _measurementService.GetByIdAsync(id);
 
-            var measurement = await _context.Measurements
-                .FirstOrDefaultAsync(m => m.MeasurementID == id);
             if (measurement == null)
             {
                 return NotFound();
@@ -45,29 +45,34 @@ namespace TailorManagementApp.Controllers
             return PartialView(measurement);
         }
 
-        // GET: Measurements/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return PartialView();
         }
 
-        // POST: Measurements/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MeasurementID,Name,Description")] Measurement measurement)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(measurement);
-                await _context.SaveChangesAsync();
-                return Redirect("~/Measurements/Index/");
+                try
+                {
+                    await _measurementService.CreateAsync(measurement);
+                    return Redirect("~/Measurements/Index/");
+                }
+                catch(Exception)
+                {
+                    throw;
+                }
+                
             }
             return PartialView(measurement);
         }
 
-        // GET: Measurements/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -75,7 +80,7 @@ namespace TailorManagementApp.Controllers
                 return NotFound();
             }
 
-            var measurement = await _context.Measurements.FindAsync(id);
+            var measurement =await _measurementService.FindByIdAsync(id);
             if (measurement == null)
             {
                 return NotFound();
@@ -83,9 +88,7 @@ namespace TailorManagementApp.Controllers
             return PartialView(measurement);
         }
 
-        // POST: Measurements/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+  
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MeasurementID,Name,Description")] Measurement measurement)
@@ -99,12 +102,12 @@ namespace TailorManagementApp.Controllers
             {
                 try
                 {
-                    _context.Update(measurement);
-                    await _context.SaveChangesAsync();
+                    await _measurementService.UpdateAsync(measurement);
+                    return Redirect("~/Measurements/Index/");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MeasurementExists(measurement.MeasurementID))
+                    if (!_measurementService.IsExists(measurement.MeasurementID))
                     {
                         return NotFound();
                     }
@@ -113,12 +116,12 @@ namespace TailorManagementApp.Controllers
                         throw;
                     }
                 }
-                return Redirect("~/Measurements/Index/");
+                
             }
             return PartialView(measurement);
         }
 
-        // GET: Measurements/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,8 +129,7 @@ namespace TailorManagementApp.Controllers
                 return NotFound();
             }
 
-            var measurement = await _context.Measurements
-                .FirstOrDefaultAsync(m => m.MeasurementID == id);
+            var measurement = await _measurementService.FindByIdAsync(id);
             if (measurement == null)
             {
                 return NotFound();
@@ -136,20 +138,20 @@ namespace TailorManagementApp.Controllers
             return PartialView(measurement);
         }
 
-        // POST: Measurements/Delete/5
+     
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var measurement = await _context.Measurements.FindAsync(id);
-            _context.Measurements.Remove(measurement);
-            await _context.SaveChangesAsync();
-            return Redirect("~/Measurements/Index/");
+            try
+            {
+                await _measurementService.DeleteAsync(id);
+                return Redirect("~/Measurements/Index/");
+            }
+            catch (Exception) { throw;  }
+            
         }
 
-        private bool MeasurementExists(int id)
-        {
-            return _context.Measurements.Any(e => e.MeasurementID == id);
-        }
+        
     }
 }

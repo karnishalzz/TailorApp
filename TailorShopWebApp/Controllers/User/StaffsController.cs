@@ -27,13 +27,13 @@ namespace TailorManagementApp.Controllers
             _env = env;
         }
 
-        // GET: Staffs
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Staff.ToListAsync());
         }
 
-        // GET: Staffs/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -51,15 +51,13 @@ namespace TailorManagementApp.Controllers
             return PartialView(staff);
         }
 
-        // GET: Staffs/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Staffs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StaffID,Name,Phone,Address,NID,ImageUpload")] Staff staff)
@@ -88,7 +86,7 @@ namespace TailorManagementApp.Controllers
             return View(staff);
         }
 
-        // GET: Staffs/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -104,9 +102,6 @@ namespace TailorManagementApp.Controllers
             return View(staff);
         }
 
-        // POST: Staffs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("StaffID,Name,Phone,Address,NID,ImageUpload")] Staff staff)
@@ -177,7 +172,7 @@ namespace TailorManagementApp.Controllers
             return Redirect("~/Staffs/Index/");
         }
 
-        // GET: Staffs/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -195,7 +190,6 @@ namespace TailorManagementApp.Controllers
             return PartialView(staff);
         }
 
-        // POST: Staffs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

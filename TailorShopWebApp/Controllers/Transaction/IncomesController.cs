@@ -22,11 +22,14 @@ namespace TailorManagementApp.Controllers
             _context = context;
         }
 
-        // GET: Incomes
+        
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Incomes.ToListAsync());
         }
+
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var incomeViewModel = new IncomeViewModel();

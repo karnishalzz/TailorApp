@@ -21,6 +21,7 @@ namespace TailorManagementApp.Controllers.Others
             _context = context;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Stocks()
         {
             var stock = await _context.Stocks
@@ -30,6 +31,8 @@ namespace TailorManagementApp.Controllers.Others
                 .ToListAsync();
             return View(stock);
         }
+
+        [HttpGet]
         public async Task<IActionResult> FilterDate(string fromDate,string toDate)
         {
             ViewData["msg"] = "showing results from date " + fromDate + " to " + toDate;
@@ -47,6 +50,8 @@ namespace TailorManagementApp.Controllers.Others
 
             return View("Stocks", stock);
         }
+
+        [HttpGet]
         public async Task<IActionResult> Filter(string option)
         {
             
@@ -75,7 +80,7 @@ namespace TailorManagementApp.Controllers.Others
 
             return View( "Stocks", stock);
         }
-
+        [HttpGet]
         public ActionResult MonthlySalesByDate()
         {
             int year = DateTime.Now.Year;
@@ -98,7 +103,7 @@ namespace TailorManagementApp.Controllers.Others
             };
             return View(model);
         }
-        [HttpPost]
+        [HttpGet]
         public ActionResult MonthlySalesByDate(string _year, string _month)
         {
             //assign incoming values to the variables
@@ -133,16 +138,19 @@ namespace TailorManagementApp.Controllers.Others
             };
             return View(model);
         }
+        [HttpGet]
         public ActionResult DailySales()
         {
             var list = _context.Sales.Where(x =>x.Date.Date== DateTime.Now.Date).ToList();
             return View(list);
         }
+        [HttpGet]
         public ActionResult DailySalesFor(DateTime getDate)
         {
             var list = _context.Sales.Where(x =>x.Date.Date==getDate.Date).ToList();
             return PartialView("_DailySalesPartialView", list);
         }
+        [HttpGet]
         public ActionResult YearlySales()
         {
             int year = DateTime.Now.Year;
@@ -165,7 +173,7 @@ namespace TailorManagementApp.Controllers.Others
             };
             return View(model);
         }
-        [HttpPost]
+        [HttpGet]
         public ActionResult YearlySales(string _year)
         {
             int year = 0;

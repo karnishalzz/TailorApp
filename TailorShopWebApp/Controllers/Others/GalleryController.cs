@@ -22,7 +22,7 @@ namespace TailorManagementApp.Controllers
             _context = context;
 
         }
-        // GET: Gallery 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var viewModel = new GalleryViewModel();
