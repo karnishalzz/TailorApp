@@ -1,0 +1,122 @@
+﻿@model TailorApp.Web.ViewModels.GalleryViewModel
+@using TailorApp.Domain.Entities.InventoryModel;
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*<div class="container">
+
+        <h1 class="font-weight-light text-center text-lg-left mt-4 mb-0">Thumbnail Gallery</h1>
+
+        <hr class="mt-2 mb-5">
+
+        <div class="row text-center text-lg-left">
+            <div align="center">
+                <button class="btn btn-default filter-button" data-filter="all">All</button>
+                <button class="btn btn-default filter-button" data-filter="hdpe">HDPE Pipes</button>
+                <button class="btn btn-default filter-button" data-filter="sprinkle">Sprinkle Pipes</button>
+                <button class="btn btn-default filter-button" data-filter="spray">Spray Nozzle</button>
+                <button class="btn btn-default filter-button" data-filter="irrigation">Irrigation Pipes</button>
+            </div>
+            @foreach (var item in Model)
+            {
+                <div class="gallery_product col-lg-3 col-md-4 col-6 filter hdpe">
+                    <a href="#" class="d-block mb-4 h-100">
+                        <img src="@item.ImagePath" class="img-responsive" height="250" width="250" />
+                    </a>
+                </div>
+            }
+
+        </div>
+
+    </div>*@
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-block">
+                    <div class="page-body gallery-page">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div align="center">
+                                    <button class="btn btn-default filter-button" data-filter="All">All</button>
+                                    <button class="btn btn-default filter-button" data-filter="Rent">Rent Items</button>
+                                    <button class="btn btn-default filter-button" data-filter="Sale">Sale items</button>
+                                    <button class="btn btn-default filter-button" data-filter="Other">Other Items</button>
+                                    <button class="btn btn-default filter-button" data-filter="Product">Catelog Items</button>
+                                </div>
+
+                                <div class="card-block">
+                                    <div class="row">
+                                        @foreach (var item in Model.Stocks)
+                                        {
+                                            if (item.Category == CategoryType.Rent)
+                                            {
+                                                <div class="col-lg-4 col-sm-6 filter Rent">
+                                                    <div class="thumbnail ">
+                                                        <div class="thumb">
+                                                            <a href="#" class="d-block mb-4 h-100">
+                                                                <img src="@item.Item.ImagePath" alt="@item.Item.Name" class="img-fluid img-thumbnail" height="500" width="500"><br />
+                                                                <label><b>Name: </b>@item.Item.Name</label><br />
+                                                                <label><b>Price: </b>@item.SellingPrice</label><br />
+                                                                <label>@item.Item.Description</label>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            if (item.Category == CategoryType.Sale)
+                                            {
+                                                <div class="col-lg-4 col-sm-6 filter Sale ">
+                                                    <div class="thumbnail ">
+                                                        <div class="thumb">
+                                                            <a href="#" class="d-block mb-4 h-100">
+                                                                <img src="@item.Item.ImagePath" alt="@item.Item.Name" class="img-fluid img-thumbnail" height="500" width="500"><br />
+                                                                <label><b>Name: </b>@item.Item.Name</label><br />
+                                                                <label><b>Price: </b>@item.SellingPrice</label><br />
+                                                                <label>@item.Item.Description</label>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            if (item.Category == CategoryType.Others)
+                                            {
+                                                <div class="col-lg-4 col-sm-6 filter Other ">
+                                                    <div class="thumbnail ">
+                                                        <div class="thumb">
+                                                            <a href="#" class="d-block mb-4 h-100">
+                                                                <img src="@item.Item.ImagePath" alt="@item.Item.Name" class="img-fluid img-thumbnail" height="500" width="500"><br />
+                                                                <label><b>Name: </b>@item.Item.Name</label><br />
+                                                                <label><b>Price: </b>@item.SellingPrice</label><br />
+                                                                <label>@item.Item.Description</label>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        @foreach (var item in Model.Products)
+                                        {
+
+                                            <div class="col-lg-4 col-sm-6 filter Product">
+
+                                                <a href="#" class="d-block mb-4 h-100">
+                                                    <img src="@item.ImagePath" alt="@item.Name" class="img-fluid img-thumbnail" height="500" width="500"><br />
+                                                    <label><b>Name: </b>@item.Name</label><br />
+                                                    <label>@item.Description</label>
+                                                </a>
+
+                                            </div>
+
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                    </div></div></div></div>
