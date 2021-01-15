@@ -14,39 +14,21 @@ namespace TailorApp.Web.Controllers
     [Authorize]
     public class CategoriesController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly ICategoryService _categoryService;
+        private readonly ApplicationDbContext _context;
 
-        public CategoriesController(ApplicationDbContext context,
-            ICategoryService categoryService)
+        public CategoriesController(ICategoryService categoryService,ApplicationDbContext context)
         {
-            _context = context;
             _categoryService = categoryService;
+            _context = context;
         }
 
+        
         [HttpGet]
-        public async Task<IActionResult> Index(int? id)
+        public async Task<IActionResult> Index()
         {
-            CategoryViewModel viewModel = new CategoryViewModel
-            {
-                Categories = await _context.Categories
-                  .Include(i => i.Enrollments)
-                    .ThenInclude(i => i.Measurement)
-                  .AsNoTracking()
-                  .OrderBy(i => i.Name)
-                  .ToListAsync()
-            };
-
-            if (id != null)
-            {
-                ViewData["CategoryID"] = id.Value;
-                Category category = viewModel.Categories.Where(
-                    i => i.CategoryID == id.Value).Single();
-                viewModel.Measurements = category.Enrollments.Select(s => s.Measurement);
-            }
-
-
-            return View(viewModel);
+            var categories = await _categoryService.GetListAsync();
+            return View(categories);
         }
 
 
@@ -103,11 +85,8 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            Category category = await _context.Categories
-                .Include(c => c.Enrollments)
-                .ThenInclude(s => s.Measurement)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.CategoryID == id);
+            Category category = await _categoryService.FindByIdAsync(id);
+     ;
 
             if (category == null)
             {
@@ -120,49 +99,47 @@ namespace TailorApp.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, string[] selectedMeasurements)
+        public async Task<IActionResult> Edit(int id, [Bind("CategoryID,Name,Description")] Category category,string[] selectedMeasurements)
         {
-            if (id == null)
+            if (id != category.CategoryID)
             {
                 return NotFound();
-
             }
-            Category categoryToUpdate = await _context.Categories
-                .Include(i => i.Enrollments)
-                 .ThenInclude(i => i.Measurement)
-                .FirstOrDefaultAsync(s => s.CategoryID == id);
+
             if (ModelState.IsValid)
             {
-
-                if (await TryUpdateModelAsync<Category>(
-                    categoryToUpdate,
-                    "",
-                    i => i.Name, i => i.Enrollments, i => i.Description))
+                try
                 {
-                    UpdateCategoryMeasurements(selectedMeasurements, categoryToUpdate);
-                    try
-                    {
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateException /* ex */)
-                    {
-                        //Log the error (uncomment ex variable name and write a log.)
-                        ModelState.AddModelError("", "Unable to save changes. " +
-                            "Try again, and if the problem persists, " +
-                            "see your system administrator.");
-                    }
+                    Category catogoryToUpdate =await _categoryService.FindByIdAsync(id);
+                    catogoryToUpdate.Name = category.Name;
+                    catogoryToUpdate.Description = category.Description;
+                    AddEnrollments(selectedMeasurements, catogoryToUpdate);
+
+                    await _categoryService.UpdateAsync(catogoryToUpdate);
                     return Redirect("~/Categories/Index/");
                 }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_categoryService.IsExists(category.CategoryID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
             }
-            UpdateCategoryMeasurements(selectedMeasurements, categoryToUpdate);
-            PopulateAssignedMeasurement(categoryToUpdate);
-            return PartialView(categoryToUpdate);
+            
+            PopulateAssignedMeasurement(category);
+            return PartialView(category);
         }
 
 
 
         [HttpGet]
-        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
+        public async Task<IActionResult> Delete(int? id)
         {
 
             if (id == null)
@@ -170,19 +147,12 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            Category category = await _context.Categories
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.CategoryID == id);
+            Category category = await _categoryService.FindByIdAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
-            if (saveChangesError.GetValueOrDefault())
-            {
-                ViewData["ErrorMessage"] =
-                    "Delete failed. Try again, and if the problem persists " +
-                    "see your system administrator.";
-            }
+
             return PartialView(category);
         }
 
@@ -190,14 +160,7 @@ namespace TailorApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            Category category = await _context.Categories
-                .Include(i => i.Enrollments)
-                .SingleAsync(i => i.CategoryID == id);
-
-
-            _context.Categories.Remove(category);
-
-            await _context.SaveChangesAsync();
+            await _categoryService.DeleteAsync(id);
             return Redirect("~/Categories/Index/");
         }
         //private methods
@@ -237,7 +200,7 @@ namespace TailorApp.Web.Controllers
 
         }
 
-        private void UpdateCategoryMeasurements(string[] selectedMeasurements, Category categoryToUpdate)
+        private void AddEnrollments(string[] selectedMeasurements, Category categoryToUpdate)
         {
 
             if (selectedMeasurements == null)

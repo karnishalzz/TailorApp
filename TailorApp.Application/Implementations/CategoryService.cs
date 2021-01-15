@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TailorApp.Application.Services;
+using TailorApp.Domain.Entities;
 using TailorApp.Domain.Repositories;
 
 namespace TailorApp.Application.Implementations
@@ -13,9 +16,40 @@ namespace TailorApp.Application.Implementations
         {
             _categoryRepository = customerRepository;
         }
+
+        public async Task CreateAsync(Category category)
+        {
+             await _categoryRepository.CreateAsync(category);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+             await _categoryRepository.DeleteAsync(id);
+        }
+
+        public async Task<Category> FindByIdAsync(int? id)
+        {
+            return await _categoryRepository.FindByIdAsync(id);
+        }
+
+        public async Task<List<Category>> GetListAsync()
+        {
+            return await _categoryRepository.GetListAsync();
+        }
+
         public async Task<SelectList> GetSelectListAsync(int? selectedCategoryId = null)
         {
             return await _categoryRepository.GetSelectListAsync(selectedCategoryId);
+        }
+
+        public bool IsExists(int id)
+        {
+            return _categoryRepository.IsExists(id);
+        }
+
+        public async Task UpdateAsync(Category category)
+        {
+            await _categoryRepository.UpdateAsync(category);
         }
     }
 }

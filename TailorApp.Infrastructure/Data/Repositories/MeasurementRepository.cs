@@ -25,12 +25,6 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
             return _context.Measurements.Any(e => e.MeasurementID == id);
         }
-        public async Task<Measurement> GetByIdAsync(int? id)
-        {
-            return await _context.Measurements
-                .FirstOrDefaultAsync(m => m.MeasurementID == id);
-        }
-
         public async Task<Measurement> FindByIdAsync(int? id)
         {
             return await _context.Measurements.FindAsync(id);

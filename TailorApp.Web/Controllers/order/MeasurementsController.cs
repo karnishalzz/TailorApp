@@ -41,7 +41,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            Measurement measurement = await _measurementService.GetByIdAsync(id);
+            Measurement measurement = await _measurementService.FindByIdAsync(id);
 
             if (measurement == null)
             {

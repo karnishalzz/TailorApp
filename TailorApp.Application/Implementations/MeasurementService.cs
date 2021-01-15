@@ -29,11 +29,7 @@ namespace TailorApp.Application.Implementations
         {
             return _measurementRepository.IsExists(id);
         }
-        public async Task<Measurement> GetByIdAsync(int? id)
-        {
-            return await _measurementRepository.GetByIdAsync(id);
-        }
-
+        
         public async Task<Measurement> FindByIdAsync(int? id)
         {
             return await _measurementRepository.FindByIdAsync(id);

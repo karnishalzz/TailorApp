@@ -1,5 +1,5 @@
 ﻿
-@model TailorApp.Web.ViewModels.CategoryViewModel
+@model IEnumerable<TailorApp.Domain.Entities.Category>
 
 
 @{
@@ -29,14 +29,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Categories)
+                            @foreach (var item in Model)
                             {
-                                string selectedRow = "";
-                                if (item.CategoryID == (int?)ViewData["CategoryID"])
-                                {
-                                    selectedRow = "success";
-                                }
-                                <tr class="@selectedRow">
+
+                                <tr>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Name)
                                     </td>
@@ -75,10 +71,10 @@
 
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="~/js/Popup.js"></script>
-    
-        <script src="~/js/NavActive.js"></script>
 
-    
+    <script src="~/js/NavActive.js"></script>
+
+
     <script>
 
         $(document).ready(function () {
