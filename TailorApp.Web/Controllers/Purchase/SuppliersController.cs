@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.PurchaseModel;
 using TailorApp.Infrastructure.Data;
@@ -15,21 +16,22 @@ namespace TailorApp.Web.Controllers.PurchaseController
     [Authorize]
     public class SuppliersController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ISupplierService _supplierService;
 
-        public SuppliersController(ApplicationDbContext context)
+        public SuppliersController(ISupplierService supplierService)
         {
-            _context = context;
+            _supplierService = supplierService;
         }
 
-        // GET: Suppliers
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Suppliers.ToListAsync());
+            var suppliers =await _supplierService.GetListAsync();
+            return View(suppliers);
         }
 
        
-        // GET: Suppliers/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,8 +39,7 @@ namespace TailorApp.Web.Controllers.PurchaseController
                 return NotFound();
             }
 
-            var supplier = await _context.Suppliers
-                .FirstOrDefaultAsync(m => m.SupplierID == id);
+            var supplier = await _supplierService.FindByIdAsync(id);
             if (supplier == null)
             {
                 return NotFound();
@@ -47,30 +48,26 @@ namespace TailorApp.Web.Controllers.PurchaseController
             return PartialView(supplier);
         }
 
-        // GET: Suppliers/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return PartialView();
         }
 
-        // POST: Suppliers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("SupplierID,Name,Address,Contact,Description")] Supplier supplier)
-        
         {
             if (ModelState.IsValid)
             {
-                _context.Add(supplier);
-                await _context.SaveChangesAsync();
+                await _supplierService.CreateAsync(supplier);
                 return RedirectToAction(nameof(Index));
             }
             return PartialView(supplier);
         }
 
-        // GET: Suppliers/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,7 +75,7 @@ namespace TailorApp.Web.Controllers.PurchaseController
                 return NotFound();
             }
 
-            var supplier = await _context.Suppliers.FindAsync(id);
+            var supplier = await _supplierService.FindByIdAsync(id);
             if (supplier == null)
             {
                 return NotFound();
@@ -86,9 +83,7 @@ namespace TailorApp.Web.Controllers.PurchaseController
             return PartialView(supplier);
         }
 
-        // POST: Suppliers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SupplierID,Name,Address,Contact,Description")] Supplier supplier)
@@ -102,12 +97,11 @@ namespace TailorApp.Web.Controllers.PurchaseController
             {
                 try
                 {
-                    _context.Update(supplier);
-                    await _context.SaveChangesAsync();
+                    await _supplierService.UpdateAsync(supplier);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SupplierExists(supplier.SupplierID))
+                    if (!_supplierService.IsExists(supplier.SupplierID))
                     {
                         return NotFound();
                     }
@@ -121,7 +115,7 @@ namespace TailorApp.Web.Controllers.PurchaseController
             return PartialView(supplier);
         }
 
-        // GET: Suppliers/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,8 +123,7 @@ namespace TailorApp.Web.Controllers.PurchaseController
                 return NotFound();
             }
 
-            var supplier = await _context.Suppliers
-                .FirstOrDefaultAsync(m => m.SupplierID == id);
+            var supplier = await _supplierService.FindByIdAsync(id);
             if (supplier == null)
             {
                 return NotFound();
@@ -139,20 +132,14 @@ namespace TailorApp.Web.Controllers.PurchaseController
             return PartialView(supplier);
         }
 
-        // POST: Suppliers/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var supplier = await _context.Suppliers.FindAsync(id);
-            _context.Suppliers.Remove(supplier);
-            await _context.SaveChangesAsync();
+            await _supplierService.DeleteAsync(id);
             return Redirect("~/Suppliers/Index/");
         }
 
-        private bool SupplierExists(int id)
-        {
-            return _context.Suppliers.Any(e => e.SupplierID == id);
-        }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.PurchaseModel;
 using TailorApp.Infrastructure.Data;
@@ -15,18 +16,18 @@ namespace TailorApp.Web.Controllers.StockController
     [Authorize(Roles = "Admin,Manager")]
     public class PurchasesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPurchaseService _purchaseService;
 
-        public PurchasesController(ApplicationDbContext context)
+        public PurchasesController(IPurchaseService purchaseService)
         {
-            _context = context;
+            _purchaseService = purchaseService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Purchases.Include(p => p.Supplier);
-            return View(await applicationDbContext.ToListAsync());
+            var items = await _purchaseService.GetListAsync();
+            return View(items);
         }
 
         [HttpGet]
@@ -37,11 +38,7 @@ namespace TailorApp.Web.Controllers.StockController
                 return NotFound();
             }
 
-            var purchase = await _context.Purchases
-                .Include(p => p.Supplier)
-                .Include(p=>p.PurchaseDetails)
-                .ThenInclude(x=>x.Item)
-                .FirstOrDefaultAsync(m => m.PurchaseID == id);
+            var purchase = await _purchaseService.FindByIdAsync(id);
             if (purchase == null)
             {
                 return NotFound();
@@ -56,11 +53,7 @@ namespace TailorApp.Web.Controllers.StockController
             {
                 return NotFound();
             }
-            var purchase = await _context.PurchaseDetails
-                .Include(c => c.Item)
-                .Include(s => s.Purchase)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.PurchaseDetailID == id);
+            var purchase = await _purchaseService.FindByIdAsync(id);
 
            
             if (purchase == null)
@@ -80,8 +73,9 @@ namespace TailorApp.Web.Controllers.StockController
             {
                 return NotFound();
             }
-            var _purchase = _context.Purchases.FirstOrDefault(x=>x.PurchaseID==purchaseDetail.PurchaseID);
-            var _purchaseDetail = _context.PurchaseDetails.FirstOrDefault(x=>x.PurchaseDetailID==purchaseDetail.PurchaseDetailID);
+            Purchase _purchase =await _purchaseService.FindByIdAsync(purchaseDetail.PurchaseID);
+            PurchaseDetail _purchaseDetail =await _purchaseService.FindDetailByIdAsync(purchaseDetail.PurchaseDetailID);
+
             _purchase.GrandTotal -= (_purchaseDetail.CostPrice * _purchaseDetail.Quantity);
             _purchase.Amount -= (_purchaseDetail.CostPrice * _purchaseDetail.Quantity);
             try
@@ -92,13 +86,14 @@ namespace TailorApp.Web.Controllers.StockController
                 _purchaseDetail.Category = purchaseDetail.Category;
                 _purchase.GrandTotal += (_purchaseDetail.CostPrice * _purchaseDetail.Quantity);
                 _purchase.Amount += (_purchaseDetail.CostPrice * _purchaseDetail.Quantity);
-                _context.Update(_purchaseDetail);
-                _context.Update(_purchase);
-                await _context.SaveChangesAsync();
+
+                await _purchaseService.UpdateDetailAsync(_purchaseDetail);
+                await _purchaseService.UpdateAsync(_purchase);
+              
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PurchaseDetailExists(purchaseDetail.PurchaseDetailID))
+                if (!_purchaseService.DetailIsExists(purchaseDetail.PurchaseDetailID))
                 {
                     return NotFound();
                 }
@@ -111,10 +106,5 @@ namespace TailorApp.Web.Controllers.StockController
      
         }
 
-      
-        private bool PurchaseDetailExists(int id)
-        {
-            return _context.PurchaseDetails.Any(e => e.PurchaseDetailID == id);
-        }
     }
 }

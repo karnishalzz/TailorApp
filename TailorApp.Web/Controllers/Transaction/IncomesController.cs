@@ -18,11 +18,16 @@ namespace TailorApp.Web.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IIncomeService _incomeService;
+        private readonly IOrderService _orderService;
 
 
-        public IncomesController(IIncomeService incomeService)
+        public IncomesController(IIncomeService incomeService,
+            IOrderService orderService,
+            ApplicationDbContext context)
         {
             _incomeService = incomeService;
+            _orderService = orderService;
+            _context = context;
         }
 
         
@@ -41,11 +46,7 @@ namespace TailorApp.Web.Controllers
 
             if (incomeViewModel.Income.OrderID != null)
             {
-                incomeViewModel.Order = _context.Orders.Where(o => o.OrderID == incomeViewModel.Income.OrderID)
-                    .Include(o=>o.Customer)
-                    .Include(o => o.OrderDetails)
-                    .ThenInclude(o=>o.Category)
-                    .FirstOrDefault();   
+                incomeViewModel.Order = await _orderService.FindByIdAsync(incomeViewModel.Income.OrderID);
             }
             if (incomeViewModel.Income.RentID!=null)
             {
