@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.Base;
-using TailorApp.Infrastructure.Data;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
@@ -19,13 +18,13 @@ namespace TailorApp.Web.Controllers
     [Authorize]
     public class CustomersController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICustomerService _customerService;
         private readonly IWebHostEnvironment _env;
         public ImageUploader _imageUploader = new ImageUploader();
 
-        public CustomersController(ApplicationDbContext context, IWebHostEnvironment env)
+        public CustomersController(ICustomerService customerService, IWebHostEnvironment env)
         {
-            _context = context;
+            _customerService = customerService;
             _env = env;
         }
 
@@ -33,7 +32,8 @@ namespace TailorApp.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Customers.ToListAsync());
+            var customers =await _customerService.GetListAsync();
+            return View(customers);
         }
 
         [HttpGet]
@@ -44,8 +44,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.CustomerID == id);
+            var customer = await _customerService.FindByIdAsync(id);
             if (customer == null)
             {
                 return NotFound();
@@ -59,7 +58,7 @@ namespace TailorApp.Web.Controllers
         {
             return View();
         }
-
+        [HttpGet]
         public IActionResult CreateModal()
         {
             return PartialView();
@@ -81,13 +80,12 @@ namespace TailorApp.Web.Controllers
                 string dbPath = _imageUploader.UploadImages(customer.ImageUpload, applicationImagePath, dbImagePath);
                 customer.ImagePath = dbPath ?? "N/A";
             }
-            else { customer.ImagePath = "N/A"; }
+            else customer.ImagePath = "N/A"; 
 
             if (ModelState.IsValid)
             {
                 customer.RegisterDate = DateTime.Now;
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
+                await _customerService.CreateAsync(customer);
                 return Redirect("~/Customers/Index/");
             }
 
@@ -104,7 +102,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _customerService.FindByIdAsync(id);
             if (customer == null)
             {
                 return NotFound();
@@ -123,7 +121,10 @@ namespace TailorApp.Web.Controllers
 
 
 
-            var customerToUpdate = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == id);
+            var customerToUpdate = await _customerService.FindByIdAsync(id);
+            customerToUpdate.Name = customer.Name;
+            customerToUpdate.Phone = customer.Phone;
+            customerToUpdate.Address = customer.Address;
 
             string applicationImagePath = Path.Combine(_env.WebRootPath + $"{Path.DirectorySeparatorChar}CustomerImages{Path.DirectorySeparatorChar}");
             //wwwroot/Users/
@@ -138,14 +139,8 @@ namespace TailorApp.Web.Controllers
                     if (dbPath != null)
                     {
                         _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + customerToUpdate.ImagePath);
-
-
-                        if (await TryUpdateModelAsync<Customer>(customerToUpdate, "", i => i.Name, i => i.Phone, i => i.Address))
-                        {
-                            customerToUpdate.ImagePath = dbPath;
-                            await _context.SaveChangesAsync();
-                        }
-
+                        customerToUpdate.ImagePath = dbPath;
+                        await _customerService.UpdateAsync(customerToUpdate);
 
                         return Redirect("~/Customers/Index/");
                     }
@@ -158,18 +153,14 @@ namespace TailorApp.Web.Controllers
                 }
                 else
                 {
-                    if (await TryUpdateModelAsync<Customer>(customerToUpdate, "", i => i.Name, i => i.Phone, i => i.Address))
-                    {
-                        await _context.SaveChangesAsync();
-                    }
-
+                   await _customerService.UpdateAsync(customerToUpdate);
                 }
 
             }
 
             catch (DbUpdateConcurrencyException)
             {
-                if (!CustomerExists(customer.CustomerID))
+                if (!_customerService.IsExists(customer.CustomerID))
                 {
                     return View(customer);
                 }
@@ -194,8 +185,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.CustomerID == id);
+            var customer = await _customerService.FindByIdAsync(id);
             if (customer == null)
             {
                 return NotFound();
@@ -209,10 +199,11 @@ namespace TailorApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var custommer = await _context.Customers.FindAsync(id);
-            _context.Customers.Remove(custommer);
-            _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + custommer.ImagePath);
-            await _context.SaveChangesAsync();
+            var customer = await _customerService.FindByIdAsync(id);
+            _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + customer.ImagePath);
+
+            await _customerService.DeleteAsync(customer);
+            
             return Redirect("~/Customers/Index/");
         }
 
@@ -227,7 +218,7 @@ namespace TailorApp.Web.Controllers
             {
                 if (state)
                 {
-                    var customer = _context.Customers.Find(int.Parse(id));
+                    var customer =await _customerService.FindByIdAsync(int.Parse(id));
                     var phone = "+88" + customer.Phone;
                     state = await SendSms(phone, msg);
                     if (state == true) count++;
@@ -272,10 +263,6 @@ namespace TailorApp.Web.Controllers
 
         }
 
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.CustomerID == id);
-        }
 
     }
 }
