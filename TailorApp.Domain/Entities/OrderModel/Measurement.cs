@@ -24,6 +24,6 @@ namespace TailorApp.Domain.Entities
 
         public ICollection<CategoryMeasurement> Enrollments { get; set; }
         
-        public ICollection<OrderDetalMeasurement> OrderDetalMeasurements { get; set; }
+        public ICollection<OrderDetailMeasurement> OrderDetalMeasurements { get; set; }
     }
 }

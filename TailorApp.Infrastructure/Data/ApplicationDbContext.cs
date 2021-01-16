@@ -30,7 +30,7 @@ namespace TailorApp.Infrastructure.Data
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
-        public DbSet<OrderDetalMeasurement> OrderDetalMeasurements { get; set; }
+        public DbSet<OrderDetailMeasurement> OrderDetalMeasurements { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Sales> Sales { get; set; }
@@ -58,7 +58,7 @@ namespace TailorApp.Infrastructure.Data
             modelBuilder.Entity<Purchase>().ToTable("Purchase");
             modelBuilder.Entity<PurchaseDetail>().ToTable("PurchaseDetail");
             modelBuilder.Entity<OrderDetail>().ToTable("OrderDetail");
-            modelBuilder.Entity<OrderDetalMeasurement>().ToTable("OrderDetalMeasurement");
+            modelBuilder.Entity<OrderDetailMeasurement>().ToTable("OrderDetalMeasurement");
             modelBuilder.Entity<Item>().ToTable("Item");
             modelBuilder.Entity<Stock>().ToTable("Stock");
             modelBuilder.Entity<Sales>().ToTable("Sale");
@@ -72,7 +72,7 @@ namespace TailorApp.Infrastructure.Data
 
             modelBuilder.Entity<CategoryMeasurement>()
                .HasKey(c => new { c.CategoryID, c.MeasurementID });
-            modelBuilder.Entity<OrderDetalMeasurement>()
+            modelBuilder.Entity<OrderDetailMeasurement>()
                .HasKey(c => new { c.OrderDetailID, c.MeasurementID });
         }
 

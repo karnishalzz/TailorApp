@@ -21,11 +21,15 @@ namespace TailorApp.Web.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICustomerService _customerService;
         private readonly ICategoryService _categoryService;
+        private readonly IOrderService _orderService;
+        private readonly IIncomeService _incomeService;
         public OrdersController(
             ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             ICustomerService customerService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IOrderService orderService,
+            IIncomeService incomeService)
         {
 
             _context = context;
@@ -33,6 +37,8 @@ namespace TailorApp.Web.Controllers
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             _customerService = customerService;
             _categoryService = categoryService;
+            _orderService = orderService;
+            _incomeService = incomeService;
         }
 
         [Authorize(Roles = "Admin,Manager")]
@@ -52,10 +58,7 @@ namespace TailorApp.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewOrder()
         {
-            List<Order> model = await _context.Orders
-                .Include(o => o.Customer)
-                .ToListAsync();
-
+            List<Order> model = await _orderService.GetListAsync();
             return View(model);
         }
 
@@ -63,24 +66,18 @@ namespace TailorApp.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewOrderDetails(int id)
         {
-            List<OrderDetail> orderList = await _context.OrderDetails
-               .Include(p => p.Category)
-               .Include(p => p.OrderDetalMeasurements)
-               .ThenInclude(p => p.Measurement)
-               .Where(m => m.OrderID == id)
-               .AsNoTracking()
-               .ToListAsync();
-
-            ViewBag.Order = _context.Orders.Where(x => x.OrderID == id).FirstOrDefault();
+            ViewBag.Order =await _orderService.FindByIdAsync(id);
+            var orderList =await _orderService.GetDetailsById(id);
+               
             return View(orderList);
         }
 
-        //updates ony delivery status and payment
+        //updates only delivery status and payment
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id)
         {
-            Order order = await _context.Orders.FindAsync(id);
+            Order order = await _orderService.FindByIdAsync(id);
 
             if (ModelState.IsValid)
             {
@@ -88,13 +85,13 @@ namespace TailorApp.Web.Controllers
                 {
                     order.Paid = order.TotalPrice;
                     order.IsDelivered = true;
-                    UpdateIncome(order.Paid, order.OrderID);
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
+                    Income income = await _incomeService.GetByOrderId(order.OrderID);
+                    income.Price = order.Paid;
+                    await _incomeService.UpdateAsync(income);
+                    await _orderService.UpdateAsync(order);
                 }
                 catch (DbUpdateConcurrencyException)
-                {
-
+                { 
                     throw;
                 }
                 return Redirect("~/Orders/ViewOrder/");
@@ -107,6 +104,7 @@ namespace TailorApp.Web.Controllers
         [HttpGet]
         public JsonResult GetMeasurementsByCategoryId(int id)
         {
+           
             var query = from c in _context.Categories
                         join e in _context.Enrollments on c.CategoryID equals e.CategoryID
                         join m in _context.Measurements on e.MeasurementID equals m.MeasurementID
@@ -116,7 +114,7 @@ namespace TailorApp.Web.Controllers
                             m.MeasurementID,
                             m.Name,
                         };
-
+           
 
             return new JsonResult(new { result = query });
 
@@ -137,47 +135,47 @@ namespace TailorApp.Web.Controllers
                     DeliverDate = orderViewModel.Date,
                     CustomerID = orderViewModel.CustomerID,
                 };
-                _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
+                await _orderService.CreateAsync(order);
 
-                int orderID = _context.Orders.Max(o => o.OrderID);
-                if (await SaveOrderDetails(orderViewModel, orderID) == true)
+                if (await SaveOrderDetails(orderViewModel, order.OrderID) == true)
                 {
-                    UpdateOrder(_Total, _Paid, orderID);
-                    AddToIncome(_Paid, orderID);
+                   
+                    order.TotalPrice = _Total;
+                    order.Paid = _Paid;
+                    await _orderService.UpdateAsync(order);
+                    Income income = new Income()
+                    {
+                        Date = DateTime.Now,
+                        OrderID = order.OrderID,
+                        Name = "Order",
+                        Description = "Advanced payment " + _Paid + "TK /=",
+                        Price = 0
+                    };
+                    await _incomeService.CreateAsync(income);
                     return new JsonResult(new { Data = new { status = status, message = "Order Added Successfully" } });
                 }
 
             }
             status = false;
-            return new JsonResult(new { Data = new { status = status, message = "Error !" } });
+            return new JsonResult(new { Data = new { status = status, message = "Failed to place an order!" } });
         }
 
         
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> EditOrderMeasurements(OrderDetalMeasurement orderDetalMeasurement)
+        public async Task<IActionResult> EditOrderMeasurements(OrderDetailMeasurement item)
         {
-            OrderDetalMeasurement orderDetalMeasurementTobeUpdated = await _context.OrderDetalMeasurements
-                .Where(x => x.OrderDetailID == orderDetalMeasurement.OrderDetailID &&
-                x.MeasurementID == orderDetalMeasurement.MeasurementID)
-                .FirstOrDefaultAsync();
-            orderDetalMeasurementTobeUpdated.MeasurementValue = orderDetalMeasurement.MeasurementValue;
-            _context.Update(orderDetalMeasurementTobeUpdated);
-            _context.SaveChanges();
-            return Redirect("../Orders/ViewOrderDetails/" + orderDetalMeasurement.OrderDetailID);
+            var itemTobeUpdated =await _orderService.GetDetailMeasurementById(item.OrderDetailID, item.MeasurementID);
+            itemTobeUpdated.MeasurementValue = item.MeasurementValue;
+            await _orderService.UpdateDetailMeasurementAsync(itemTobeUpdated);
+            return Redirect("../Orders/ViewOrderDetails/" + item.OrderDetailID);
         }
         
         [Authorize]
         [HttpGet]
-        public IActionResult OrderInvoice(int id)
+        public async Task<IActionResult> OrderInvoice(int id)
         {
-            Order order = _context.Orders.Where(x => x.OrderID == id)
-                .Include(o => o.Customer)
-                .Include(o => o.OrderDetails)
-                .ThenInclude(o => o.Category)
-                .AsNoTracking()
-                .First();
+            Order order =await _orderService.FindByIdAsync(id);
             return View(order);
         }
         
@@ -215,7 +213,7 @@ namespace TailorApp.Web.Controllers
                     {
                         if (value.Id != null)
                         {
-                            OrderDetalMeasurement orderDetailMeasurement = new OrderDetalMeasurement()
+                            OrderDetailMeasurement orderDetailMeasurement = new OrderDetailMeasurement()
                             {
                                 OrderDetailID = orderDetailID,
                                 MeasurementID = Convert.ToInt32(value.Id),
@@ -241,38 +239,8 @@ namespace TailorApp.Web.Controllers
 
         }
 
-        private void UpdateOrder(decimal total, decimal paid, int orderID)
-        {
-            Order order = _context.Orders.Find(orderID);
-            order.TotalPrice = total;
-            order.Paid = paid;
-            _context.Update(order);
-            _context.SaveChanges();
-        }
-
-        private void AddToIncome(decimal paid, int orderID)
-        {
-            Income income = new Income()
-            {
-                Date = DateTime.Now,
-                OrderID = orderID,
-                Name = "Order",
-                Description = "Advanced payment " + paid + "TK /=",
-                Price = 0
-            };
-
-            _context.Incomes.Add(income);
-            _context.SaveChanges();
-        }
-        private void UpdateIncome(decimal paid, int orderID)
-        {
-            Income income = _context.Incomes.Where(x => x.OrderID == orderID).FirstOrDefault();
-            income.Price = paid;
-            // income.Description = "-";
-            _context.Update(income);
-            _context.SaveChanges();
-        }
-
+       
+        
         //To print order invoice
         public IActionResult Print(int id)
         {

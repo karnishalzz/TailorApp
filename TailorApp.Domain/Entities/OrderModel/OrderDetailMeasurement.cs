@@ -6,7 +6,7 @@ using TailorApp.Domain.Entities.Base;
 
 namespace TailorApp.Domain.Entities
 {
-    public class OrderDetalMeasurement : BaseEntity
+    public class OrderDetailMeasurement : BaseEntity
     {
         public int OrderDetailID { get; set; }
         public int MeasurementID { get; set; }

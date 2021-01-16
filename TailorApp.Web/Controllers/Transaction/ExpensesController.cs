@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
 
@@ -14,29 +15,25 @@ namespace TailorApp.Web.Controllers
     [Authorize(Roles = "Admin")]
     public class ExpensesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IExpenseService _expenseService;
 
-        public ExpensesController(ApplicationDbContext context)
+        public ExpensesController(IExpenseService expenseRepository)
         {
-            _context = context;
+            _expenseService = expenseRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Expenses.ToListAsync());
+            var expenses =await _expenseService.GetListAsync();
+            return View(expenses);
         }
 
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
 
-            var expense = await _context.Expenses
-                .Include(e=>e.Purchase)
-                .Include(p=>p.Purchase.PurchaseDetails)
-                .ThenInclude(p => p.Item)
-                .Include(s => s.Purchase.Supplier)
-                .FirstOrDefaultAsync(m => m.ExpenseID == id);
+            var expense = await _expenseService.FindByIdAsync(id);
             if (expense == null)
             {
                 return NotFound();
@@ -59,8 +56,7 @@ namespace TailorApp.Web.Controllers
             if (ModelState.IsValid)
             {
                 expense.Date = DateTime.Now;
-                _context.Add(expense);
-                await _context.SaveChangesAsync();
+                await _expenseService.CreateAsync(expense);
                 return Redirect("~/Expenses/Index/");
             }
             return PartialView(expense);
@@ -74,7 +70,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var expense = await _context.Expenses.FindAsync(id);
+            var expense = await _expenseService.FindByIdAsync(id);
             if (expense == null)
             {
                 return NotFound();
@@ -97,12 +93,11 @@ namespace TailorApp.Web.Controllers
                 try
                 {
                     expense.Date = DateTime.Now;
-                    _context.Update(expense);
-                    await _context.SaveChangesAsync();
+                    await _expenseService.UpdateAsync(expense);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ExpenseExists(expense.ExpenseID))
+                    if (!_expenseService.IsExists(expense.ExpenseID))
                     {
                         return NotFound();
                     }
@@ -124,8 +119,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var expense = await _context.Expenses
-                .FirstOrDefaultAsync(m => m.ExpenseID == id);
+            var expense = await _expenseService.FindByIdAsync(id);
             if (expense == null)
             {
                 return NotFound();
@@ -139,15 +133,9 @@ namespace TailorApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var expense = await _context.Expenses.FindAsync(id);
-            _context.Expenses.Remove(expense);
-            await _context.SaveChangesAsync();
+            await _expenseService.DeleteAsync(id);
             return Redirect("~/Expenses/Index/");
         }
 
-        private bool ExpenseExists(int id)
-        {
-            return _context.Expenses.Any(e => e.ExpenseID == id);
-        }
     }
 }

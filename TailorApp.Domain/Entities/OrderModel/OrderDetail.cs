@@ -21,6 +21,6 @@ namespace TailorApp.Domain.Entities
 
         public virtual Order Order { get; set; }
 
-        public ICollection<OrderDetalMeasurement> OrderDetalMeasurements { get; set; }
+        public ICollection<OrderDetailMeasurement> OrderDetailMeasurements { get; set; }
     }
 }

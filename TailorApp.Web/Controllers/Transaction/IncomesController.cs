@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
 using TailorApp.Web.ViewModels;
@@ -16,26 +17,27 @@ namespace TailorApp.Web.Controllers
     public class IncomesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IIncomeService _incomeService;
 
-        public IncomesController(ApplicationDbContext context)
+
+        public IncomesController(IIncomeService incomeService)
         {
-            _context = context;
+            _incomeService = incomeService;
         }
 
         
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Incomes.ToListAsync());
+            var incomes = await _incomeService.GetListAsync();
+            return View(incomes );
         }
 
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var incomeViewModel = new IncomeViewModel();
-            incomeViewModel.Income = await _context.Incomes
-                .Where(i => i.IncomeID == id)
-                .FirstOrDefaultAsync();
+            incomeViewModel.Income = await _incomeService.FindByIdAsync(id);
 
             if (incomeViewModel.Income.OrderID != null)
             {
