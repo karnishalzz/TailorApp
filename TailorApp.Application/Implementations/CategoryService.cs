@@ -12,9 +12,9 @@ namespace TailorApp.Application.Implementations
     {
 
         private readonly ICategoryRepository _categoryRepository;
-        public CategoryService(ICategoryRepository customerRepository)
+        public CategoryService(ICategoryRepository categoryRepository)
         {
-            _categoryRepository = customerRepository;
+            _categoryRepository = categoryRepository;
         }
 
         public async Task CreateAsync(Category category)

@@ -15,12 +15,14 @@ namespace TailorApp.Web.Controllers
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
-        private readonly ApplicationDbContext _context;
+        private readonly IMeasurementService _measurementService;
 
-        public CategoriesController(ICategoryService categoryService,ApplicationDbContext context)
+        public CategoriesController(ICategoryService categoryService,
+            IMeasurementService measurementService)
         {
             _categoryService = categoryService;
-            _context = context;
+            _measurementService = measurementService;
+          
         }
 
         
@@ -31,14 +33,13 @@ namespace TailorApp.Web.Controllers
             return View(categories);
         }
 
-
+        
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
-            Category category = new Category();
-            PopulateAssignedMeasurement(category);
-            return PartialView(category);
+            await PopulateAssignedMeasurement();
+            return PartialView();
         }
 
 
@@ -59,20 +60,18 @@ namespace TailorApp.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _context.Add(category);
-                    await _context.SaveChangesAsync();
+                    await _categoryService.CreateAsync(category);
                     return Redirect("~/Categories/Index/");
                 }
 
             }
-            catch (DbUpdateException /* ex */)
+            catch (DbUpdateException )
             {
-                //Log the error (uncomment ex variable name and write a log.
                 ModelState.AddModelError("", "Unable to save changes. " +
                     "Try again, and if the problem persists " +
                     "see your system administrator.");
             }
-            PopulateAssignedMeasurement(category);
+            await PopulateAssignedMeasurement(category);
             return PartialView(category);
 
         }
@@ -86,13 +85,12 @@ namespace TailorApp.Web.Controllers
             }
 
             Category category = await _categoryService.FindByIdAsync(id);
-     ;
 
             if (category == null)
             {
                 return NotFound();
             }
-            PopulateAssignedMeasurement(category);
+            await PopulateAssignedMeasurement(category);
             return PartialView(category);
         }
 
@@ -113,7 +111,7 @@ namespace TailorApp.Web.Controllers
                     Category catogoryToUpdate =await _categoryService.FindByIdAsync(id);
                     catogoryToUpdate.Name = category.Name;
                     catogoryToUpdate.Description = category.Description;
-                    AddEnrollments(selectedMeasurements, catogoryToUpdate);
+                    await AddEnrollments(selectedMeasurements, catogoryToUpdate);
 
                     await _categoryService.UpdateAsync(catogoryToUpdate);
                     return Redirect("~/Categories/Index/");
@@ -132,7 +130,7 @@ namespace TailorApp.Web.Controllers
 
             }
             
-            PopulateAssignedMeasurement(category);
+            await PopulateAssignedMeasurement(category);
             return PartialView(category);
         }
 
@@ -164,11 +162,11 @@ namespace TailorApp.Web.Controllers
             return Redirect("~/Categories/Index/");
         }
         //private methods
-        private void PopulateAssignedMeasurement(Category category)
+        private  async Task PopulateAssignedMeasurement(Category category=null)
         {
-            DbSet<Measurement> allMeasurements = _context.Measurements;
+            List<Measurement> allMeasurements = await _measurementService.GetListAsync();
             List<AssignedMeasurements> viewModel = new List<AssignedMeasurements>();
-            if (category.CategoryID != 0)
+            if (category!= null)
             {
                 HashSet<int> categoryMeasurements = new HashSet<int>(category.Enrollments.Select(c => c.MeasurementID));
                 foreach (Measurement measurement in allMeasurements)
@@ -200,7 +198,7 @@ namespace TailorApp.Web.Controllers
 
         }
 
-        private void AddEnrollments(string[] selectedMeasurements, Category categoryToUpdate)
+        private async Task AddEnrollments(string[] selectedMeasurements, Category categoryToUpdate)
         {
 
             if (selectedMeasurements == null)
@@ -212,7 +210,7 @@ namespace TailorApp.Web.Controllers
             HashSet<string> selectedMeasurementsHS = new HashSet<string>(selectedMeasurements);
             HashSet<int> categoryMeasurements = new HashSet<int>
                 (categoryToUpdate.Enrollments.Select(c => c.Measurement.MeasurementID));
-            foreach (Measurement measurement in _context.Measurements)
+            foreach (Measurement measurement in await _measurementService.GetListAsync())
             {
                 if (selectedMeasurementsHS.Contains(measurement.MeasurementID.ToString()))
                 {
@@ -227,7 +225,7 @@ namespace TailorApp.Web.Controllers
                     if (categoryMeasurements.Contains(measurement.MeasurementID))
                     {
                         CategoryMeasurement measurementToRemove = categoryToUpdate.Enrollments.FirstOrDefault(i => i.MeasurementID == measurement.MeasurementID);
-                        _context.Remove(measurementToRemove);
+                        categoryToUpdate.Enrollments.Remove(measurementToRemove);
                     }
                 }
             }

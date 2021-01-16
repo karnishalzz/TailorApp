@@ -67,7 +67,6 @@ namespace TailorApp.Web.Controllers
             string dbImagePath = Path.Combine($"{Path.DirectorySeparatorChar}StaffImages{Path.DirectorySeparatorChar}");
             //Users/
 
-            _imageUploader.CreateDirectory(applicationImagePath);//wwwroot/Users
             if (staff.ImageUpload != null)
             {
                 string dbPath = _imageUploader.UploadImages(staff.ImageUpload, applicationImagePath, dbImagePath);

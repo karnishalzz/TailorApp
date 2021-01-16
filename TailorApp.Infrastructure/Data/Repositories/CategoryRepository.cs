@@ -35,16 +35,16 @@ namespace TailorApp.Infrastructure.Data.Repositories
                  .ToListAsync();
             return new SelectList(categoryList, "CategoryID", "Name", selectedCategoryId);
         }
+
         public async Task CreateAsync(Category category)
         {
-            _context.Categories.Add(category);
+            _context.Categories.AddRange(category);
             await _context.SaveChangesAsync();
         }
         public async Task<Category> FindByIdAsync(int? id)
         {
             return await _context.Categories
                 .Include(x => x.Enrollments)
-                .ThenInclude(x => x.Measurement)
                 .FirstOrDefaultAsync(x=>x.CategoryID==id);
 
 
@@ -61,7 +61,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
         public async Task DeleteAsync(int id)
         {
             Category item = await FindByIdAsync(id);
-            _context.Categories.Remove(item);
+            _context.Categories.RemoveRange(item);
             await _context.SaveChangesAsync();
         }
         

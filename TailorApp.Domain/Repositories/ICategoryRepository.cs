@@ -9,7 +9,6 @@ namespace TailorApp.Domain.Repositories
 {
     public interface ICategoryRepository : IScopedService
     {
-        
         IQueryable<Category> Categories { get; }
         Task<List<Category>> GetListAsync();
         Task<SelectList> GetSelectListAsync(int? selectedCategoryId);

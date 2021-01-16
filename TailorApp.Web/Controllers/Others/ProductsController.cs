@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.Base;
 using TailorApp.Infrastructure.Data;
@@ -17,21 +18,27 @@ namespace TailorApp.Web.Controllers
     [Authorize]
     public class ProductsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
         private readonly IWebHostEnvironment _env;
         public ImageUploader _imageUploader=new ImageUploader();
 
-        public ProductsController(ApplicationDbContext context,IWebHostEnvironment env)
+        public ProductsController(IProductService productService,
+            ICategoryService categoryService,
+            IWebHostEnvironment env)
         {
-            _context = context;
+            _productService = productService;
+            _categoryService = categoryService;
             _env = env;
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var categoryList = _context.Products.Include(p => p.Category);
-            return View(await categoryList.ToListAsync());
+            var categoryList =await _productService.GetListAsync();
+            return View(categoryList);
         }
 
         [HttpGet]
@@ -42,10 +49,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ProductID == id);
+            var product = await _productService.FindByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -55,9 +59,9 @@ namespace TailorApp.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
-            PopulateCategorysDropDownList();
+            await PopulateCategoryDropdownAsync();
             return View();
         }
 
@@ -71,7 +75,7 @@ namespace TailorApp.Web.Controllers
             string dbImagePath = Path.Combine($"{Path.DirectorySeparatorChar}CatelogImages{Path.DirectorySeparatorChar}");
             //Users/
 
-            _imageUploader.CreateDirectory(applicationImagePath);//wwwroot/Users
+           
 
             if (product.ImageUpload != null)
             {
@@ -82,15 +86,14 @@ namespace TailorApp.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+
+                await _productService.CreateAsync(product);
                 return Redirect("~/Products/Index/");
                 
             }
 
             ViewData["Message"] = "Something went Wrong";
-            PopulateCategorysDropDownList(product.CategoryID);
+            await PopulateCategoryDropdownAsync();
             return View(product);
 
 
@@ -105,14 +108,12 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ProductID == id);
+            var product = await _productService.FindByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
-            PopulateCategorysDropDownList(product.CategoryID);
+            await PopulateCategoryDropdownAsync(product.CategoryID);
             return View(product);
         }
 
@@ -125,11 +126,14 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var productToUpdate = await _context.Products.FirstOrDefaultAsync(s => s.ProductID == id);
+            var productToUpdate = await _productService.FindByIdAsync(id);
+            productToUpdate.Name = product.Name;
+            productToUpdate.Description = product.Description;
+            productToUpdate.CategoryID = product.CategoryID;
 
-            string applicationImagePath = Path.Combine(_env.WebRootPath + $"{Path.DirectorySeparatorChar}ItemImages{Path.DirectorySeparatorChar}");
+            string applicationImagePath = Path.Combine(_env.WebRootPath + $"{Path.DirectorySeparatorChar}CatelogImages{Path.DirectorySeparatorChar}");
             //wwwroot/Users/
-            string dbImagePath = Path.Combine($"{Path.DirectorySeparatorChar}ItemImages{Path.DirectorySeparatorChar}");
+            string dbImagePath = Path.Combine($"{Path.DirectorySeparatorChar}CatelogImages{Path.DirectorySeparatorChar}");
             //Users/
             try
             {
@@ -141,12 +145,7 @@ namespace TailorApp.Web.Controllers
                     {
                         _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + productToUpdate.ImagePath);
                         productToUpdate.ImagePath = dbPath;
-
-                        if (await TryUpdateModelAsync<Product>(productToUpdate, "", i => i.Name, i => i.Description, i => i.CategoryID))
-                        {
-                            await _context.SaveChangesAsync();
-                        }
-
+                        await _productService.UpdateAsync(productToUpdate);
 
                         return Redirect("~/Products/Index/");
                     }
@@ -159,19 +158,16 @@ namespace TailorApp.Web.Controllers
                 }
                 else
                 {
-                    if (await TryUpdateModelAsync<Product>(productToUpdate, "", i => i.Name, i => i.Description, i => i.CategoryID))
-                    {
-                        await _context.SaveChangesAsync();
-                    }
-                   
+                    await _productService.UpdateAsync(productToUpdate);
+
                 }
             }
 
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductExists(product.ProductID))
+                if (!_productService.IsExists(product.ProductID))
                 {
-                    PopulateCategorysDropDownList(product.CategoryID);
+                    await PopulateCategoryDropdownAsync(product.CategoryID);
                     return View(product);
                 }
                 else
@@ -194,10 +190,7 @@ namespace TailorApp.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ProductID == id);
+            var product = await _productService.FindByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -210,30 +203,21 @@ namespace TailorApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
+            var product = await _productService.FindByIdAsync(id);
             _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + product.ImagePath);
+
+            await _productService.DeleteAsync(product);
 
             return Redirect("~/Products/Index/");
         }
 
 
 
-        //private methods
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.ProductID == id);
-        }
-        private void PopulateCategorysDropDownList(object selectedCategory = null)
-        {
-            var categoriesQuery = from d in _context.Categories
-                                   orderby d.Name
-                                   select d;
-            ViewBag.CategoryID = new SelectList(categoriesQuery.AsNoTracking(), "CategoryID", "Name", selectedCategory);
-        }
+       private async Task PopulateCategoryDropdownAsync(int? selectedCategory = null)
+       {
+            SelectList categorySelectList = await _categoryService.GetSelectListAsync(selectedCategory);
+            ViewBag.CategoryID = categorySelectList;
+       }
        
         
     }

@@ -7,15 +7,12 @@ namespace TailorApp.Domain.Entities.Base
     public class ImageUploader
     {
 
-        public void CreateDirectory(string galleryPath)
-        {
-            if (!Directory.Exists(galleryPath))
-            {
-                Directory.CreateDirectory(galleryPath);
-            }
-        }
         public string UploadImages(IFormFile ImageUpload, string applicationImagePath, string dbImagePath)
         {
+            if (!Directory.Exists(applicationImagePath))
+            {
+                Directory.CreateDirectory(applicationImagePath);
+            }
             if (ImageUpload.Length > 0)
             {
                 string extension = Path.GetExtension(ImageUpload.FileName);

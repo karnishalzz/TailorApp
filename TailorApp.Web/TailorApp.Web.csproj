@@ -58,6 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\CatelogImages\" />
     <Folder Include="wwwroot\lib\datatables.net-bs4\css\" />
     <Folder Include="wwwroot\lib\datatables.net-bs4\js\" />
     <Folder Include="wwwroot\pages\data-table\css\" />
