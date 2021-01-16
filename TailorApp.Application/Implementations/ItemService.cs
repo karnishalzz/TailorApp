@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TailorApp.Application.Services;
+using TailorApp.Domain.Entities.InventoryModel;
+using TailorApp.Domain.Repositories;
+
+namespace TailorApp.Application.Implementations
+{
+    public class ItemService : IItemService
+    {
+        private readonly IItemRepository _itemRepository;
+        public ItemService(IItemRepository itemRepository)
+        {
+            _itemRepository = itemRepository;
+        }
+
+        public async Task CreateAsync(Item Item)
+        {
+            await _itemRepository.CreateAsync(Item);
+        }
+
+        public async Task DeleteAsync(Item Item)
+        {
+            await _itemRepository.DeleteAsync(Item);
+        }
+
+        public async Task<Item> FindByIdAsync(int? id)
+        {
+            return await _itemRepository.FindByIdAsync(id);
+        }
+
+        public async Task<List<Item>> GetListAsync()
+        {
+            return await _itemRepository.GetListAsync();
+        }
+
+        public bool IsExists(int id)
+        {
+            return _itemRepository.IsExists(id);
+        }
+
+        public async Task UpdateAsync(Item Item)
+        {
+            await _itemRepository.UpdateAsync(Item);
+        }
+    }
+}

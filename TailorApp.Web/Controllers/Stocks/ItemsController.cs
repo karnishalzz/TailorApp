@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.Base;
 using TailorApp.Domain.Entities.InventoryModel;
@@ -18,13 +19,13 @@ namespace TailorApp.Web.Controllers.StockController
     [Authorize]
     public class ItemsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IItemService _itemService;
         private readonly IWebHostEnvironment _env;
         public  ImageUploader _imageUploader=new ImageUploader();
 
-        public ItemsController(ApplicationDbContext context, IWebHostEnvironment env)
+        public ItemsController(IItemService itemService, IWebHostEnvironment env)
         {
-            _context = context;
+            _itemService = itemService;
             _env = env;
    
         }
@@ -33,7 +34,8 @@ namespace TailorApp.Web.Controllers.StockController
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Items.ToListAsync());
+            var items = await _itemService.GetListAsync();
+            return View();
         }
 
         [HttpGet]
@@ -44,8 +46,7 @@ namespace TailorApp.Web.Controllers.StockController
                 return NotFound();
             }
 
-            var item = await _context.Items
-                .FirstOrDefaultAsync(m => m.ItemID == id);
+            var item = await _itemService.FindByIdAsync(id);
             if (item == null)
             {
                 return NotFound();
@@ -84,8 +85,7 @@ namespace TailorApp.Web.Controllers.StockController
             if (ModelState.IsValid)
             {
                 item.LastUpdated = DateTime.Now;
-                _context.Add(item);
-                await _context.SaveChangesAsync();
+                _itemService.CreateAsync(item);
                 return Redirect("~/Items/Index/");
             }
 
@@ -104,7 +104,7 @@ namespace TailorApp.Web.Controllers.StockController
                 return NotFound();
             }
 
-            var item = await _context.Items.FindAsync(id);
+            var item = await _itemService.FindByIdAsync(id);
             if (item == null)
             {
                 return NotFound();
@@ -121,8 +121,12 @@ namespace TailorApp.Web.Controllers.StockController
             {
                 return NotFound();
             }
-            var itemToUpdate = await _context.Items.FirstOrDefaultAsync(s => s.ItemID == id);
-           
+            var itemToUpdate = await _itemService.FindByIdAsync(id);
+            itemToUpdate.Name = item.Name;
+            itemToUpdate.Unit = item.Unit;
+            itemToUpdate.Description = item.Description;
+            itemToUpdate.LastUpdated = DateTime.Now;
+
             string applicationImagePath = Path.Combine(_env.WebRootPath + $"{Path.DirectorySeparatorChar}ItemImages{Path.DirectorySeparatorChar}");
             //wwwroot/Users/
             string dbImagePath = Path.Combine($"{Path.DirectorySeparatorChar}ItemImages{Path.DirectorySeparatorChar}");
@@ -136,16 +140,7 @@ namespace TailorApp.Web.Controllers.StockController
                     if (dbPath!=null)
                     {
                         _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}"+itemToUpdate.ImagePath);
-                        
-                        if (await TryUpdateModelAsync<Item>(itemToUpdate,"",i => i.Name, i => i.Unit, i => i.Description))
-                        {
-                            itemToUpdate.ImagePath = dbPath;
-                            itemToUpdate.LastUpdated = DateTime.Now;
-                            await _context.SaveChangesAsync();
-                        }
-
-
-                        return Redirect("~/Items/Index/");
+                        itemToUpdate.ImagePath = dbPath;
                     }
                     else
                     {
@@ -154,22 +149,13 @@ namespace TailorApp.Web.Controllers.StockController
                     }
 
                 }
-                else
-                {
-                   
-                    if (await TryUpdateModelAsync<Item>(itemToUpdate, "", i => i.Name, i => i.Unit, i => i.Description))
-                    {
-                        itemToUpdate.LastUpdated = DateTime.Now;
-                        await _context.SaveChangesAsync();
-                    }
-              
-                }
-
+                await _itemService.UpdateAsync(itemToUpdate);
+                return Redirect("~/Items/Index/");
             }
 
             catch (DbUpdateConcurrencyException)
             {
-                if (!ItemExists(item.ItemID))
+                if (!_itemService.IsExists(item.ItemID))
                 {
                     return View(item);
                 }
@@ -191,8 +177,7 @@ namespace TailorApp.Web.Controllers.StockController
                 return NotFound();
             }
 
-            var item = await _context.Items
-                .FirstOrDefaultAsync(m => m.ItemID == id);
+            var item = await _itemService.FindByIdAsync(id);
             if (item == null)
             {
                 return NotFound();
@@ -205,17 +190,13 @@ namespace TailorApp.Web.Controllers.StockController
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = await _context.Items.FindAsync(id);
+            var item = await _itemService.FindByIdAsync(id);
             _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}"+item.ImagePath);
-            _context.Items.Remove(item);
-            await _context.SaveChangesAsync();
+
+            await _itemService.DeleteAsync(item);
             return Redirect("~/Items/Index/");
         }
 
-        private bool ItemExists(int id)
-        {
-            return _context.Items.Any(e => e.ItemID == id);
-        }
         
     }
 }
