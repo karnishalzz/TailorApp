@@ -140,21 +140,18 @@ namespace TailorApp.Web.Controllers
                     {
                         _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + customerToUpdate.ImagePath);
                         customerToUpdate.ImagePath = dbPath;
-                        await _customerService.UpdateAsync(customerToUpdate);
-
-                        return Redirect("~/Customers/Index/");
+                        
                     }
                     else
                     {
                         ViewData["Message"] = "Please select correct image.";
                         return PartialView(customer);
                     }
+                    
+                }
+                await _customerService.UpdateAsync(customerToUpdate);
+                return Redirect("~/Customers/Index/");
 
-                }
-                else
-                {
-                   await _customerService.UpdateAsync(customerToUpdate);
-                }
 
             }
 

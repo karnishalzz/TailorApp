@@ -145,9 +145,6 @@ namespace TailorApp.Web.Controllers
                     {
                         _imageUploader.DeleteImageDirectory(_env.WebRootPath + $"{Path.DirectorySeparatorChar}" + productToUpdate.ImagePath);
                         productToUpdate.ImagePath = dbPath;
-                        await _productService.UpdateAsync(productToUpdate);
-
-                        return Redirect("~/Products/Index/");
                     }
                     else
                     {
@@ -156,11 +153,8 @@ namespace TailorApp.Web.Controllers
                     }
 
                 }
-                else
-                {
-                    await _productService.UpdateAsync(productToUpdate);
-
-                }
+                await _productService.UpdateAsync(productToUpdate);
+                return Redirect("~/Products/Index/");
             }
 
             catch (DbUpdateConcurrencyException)
