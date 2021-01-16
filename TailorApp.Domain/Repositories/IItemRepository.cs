@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace TailorApp.Domain.Repositories
     {
         IQueryable<Item> Items { get; }
         Task<List<Item>> GetListAsync();
+        Task<SelectList> GetSelectListAsync(int? selectedItemId);
         bool IsExists(int id);
         Task<Item> FindByIdAsync(int? id);
         Task CreateAsync(Item Item);

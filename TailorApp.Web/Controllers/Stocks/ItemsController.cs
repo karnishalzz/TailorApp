@@ -35,7 +35,7 @@ namespace TailorApp.Web.Controllers.StockController
         public async Task<IActionResult> Index()
         {
             var items = await _itemService.GetListAsync();
-            return View();
+            return View(items);
         }
 
         [HttpGet]

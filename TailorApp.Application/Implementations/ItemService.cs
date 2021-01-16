@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,7 +37,10 @@ namespace TailorApp.Application.Implementations
         {
             return await _itemRepository.GetListAsync();
         }
-
+        public async Task<SelectList> GetSelectListAsync(int? selectedItemId = null)
+        {
+            return await _itemRepository.GetSelectListAsync(selectedItemId);
+        }
         public bool IsExists(int id)
         {
             return _itemRepository.IsExists(id);

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,14 @@ namespace TailorApp.Infrastructure.Data.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
-
+        public async Task<SelectList> GetSelectListAsync(int? selectedItemId)
+        {
+            var categoryList = await _context.Items
+                 .Select(x => new { x.ItemID, x.Name })
+                 .OrderBy(x => x.Name)
+                 .ToListAsync();
+            return new SelectList(categoryList, "CategoryID", "Name", selectedItemId);
+        }
         public bool IsExists(int id)
         {
             return _context.Items.Any(e => e.ItemID == id);
