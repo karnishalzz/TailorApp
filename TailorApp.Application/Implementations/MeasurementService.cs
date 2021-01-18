@@ -21,35 +21,18 @@ namespace TailorApp.Application.Implementations
         }
 
 
-        public async Task<List<Measurement>> GetListAsync()
-        {
-            return await _measurementRepository.GetListAsync();
-        }
-        public bool IsExists(int id)
-        {
-            return _measurementRepository.IsExists(id);
-        }
-        
-        public async Task<Measurement> FindByIdAsync(int? id)
-        {
-            return await _measurementRepository.FindByIdAsync(id);
-        }
-
-        public async Task CreateAsync(Measurement measurement)
-        {
-            await _measurementRepository.CreateAsync(measurement);
-        }
-
-        public async Task UpdateAsync(Measurement measurement)
-        {
-            await _measurementRepository.UpdateAsync(measurement);
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            await _measurementRepository.DeleteAsync(id);
-        }
-
+        public async Task<List<Measurement>> GetListAsync()=> await _measurementRepository.GetListAsync();
+       
+        public bool IsExists(int id)=> _measurementRepository.IsExists(id);
+    
+        public async Task<Measurement> FindByIdAsync(int? id)=> await _measurementRepository.FindByIdAsync(id);
+       
+        public async Task CreateAsync(Measurement measurement) => await _measurementRepository.CreateAsync(measurement);
+     
+        public async Task UpdateAsync(Measurement measurement)=> await _measurementRepository.UpdateAsync(measurement);
+       
+        public async Task DeleteAsync(int id)=> await _measurementRepository.DeleteAsync(id);
+       
         public async Task<object> GetDataTableAsync(DataTableDto dataTableDto)
         {
             try

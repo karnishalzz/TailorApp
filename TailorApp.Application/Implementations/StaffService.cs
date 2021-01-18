@@ -17,34 +17,17 @@ namespace TailorApp.Application.Implementations
             _staffRepository = staffRepository;
         }
 
-        public async Task CreateAsync(Staff Staff)
-        {
-            await _staffRepository.CreateAsync(Staff);
-        }
+        public async Task CreateAsync(Staff Staff) => await _staffRepository.CreateAsync(Staff);
+       
+        public async Task DeleteAsync(Staff Staff)=> await _staffRepository.DeleteAsync(Staff);
 
-        public async Task DeleteAsync(Staff Staff)
-        {
-            await _staffRepository.DeleteAsync(Staff);
-        }
-
-        public async Task<Staff> FindByIdAsync(int? id)
-        {
-            return await _staffRepository.FindByIdAsync(id);
-        }
-
-        public async Task<List<Staff>> GetListAsync()
-        {
-            return await _staffRepository.GetListAsync();
-        }
-
-        public bool IsExists(int id)
-        {
-            return _staffRepository.IsExists(id);
-        }
-
-        public async Task UpdateAsync(Staff Staff)
-        {
-            await _staffRepository.UpdateAsync(Staff);
-        }
+        public async Task<Staff> FindByIdAsync(int? id)=> await _staffRepository.FindByIdAsync(id);
+       
+        public async Task<List<Staff>> GetListAsync()=> await _staffRepository.GetListAsync();
+       
+        public bool IsExists(int id)=> _staffRepository.IsExists(id);
+       
+        public async Task UpdateAsync(Staff Staff)=> await _staffRepository.UpdateAsync(Staff);
+       
     }
 }

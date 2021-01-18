@@ -13,6 +13,7 @@ namespace TailorApp.Application.Services
         Task<List<Income>> GetListAsync();
         Task<Income> FindByIdAsync(int id);
         Task<Income> GetByOrderId(int orderId);
+        Task<Income> GetByRentId(int rentId);
         Task UpdateAsync(Income income);
         Task CreateAsync(Income income);
     }

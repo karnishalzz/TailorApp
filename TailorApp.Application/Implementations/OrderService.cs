@@ -16,49 +16,25 @@ namespace TailorApp.Application.Implementations
         {
             _orderRepository = orderRepository;
         }
-        public async Task CreateAsync(Order Order)
-        {
-            await _orderRepository.CreateAsync(Order);
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            await _orderRepository.DeleteAsync(id);
-        }
-
-        public async Task<Order> FindByIdAsync(int? id)
-        {
-            return await _orderRepository.FindByIdAsync(id);
-        }
-
-        public async Task<OrderDetailMeasurement> GetDetailMeasurementById(int oderdetailId, int measurementId)
-        {
-            return await _orderRepository.GetDetailMeasurementById(oderdetailId, measurementId);
-        }
-
-        public async Task<List<OrderDetail>> GetDetailsById(int orderId)
-        {
-           return await _orderRepository.GetDetailsById(orderId);
-        }
-
-        public async Task<List<Order>> GetListAsync()
-        {
-            return await _orderRepository.GetListAsync();
-        }
-
-        public bool IsExists(int id)
-        {
-            return _orderRepository.IsExists(id);
-        }
-
-        public async Task UpdateAsync(Order Order)
-        {
-            await _orderRepository.UpdateAsync(Order);
-        }
-
-        public async Task UpdateDetailMeasurementAsync(OrderDetailMeasurement item)
-        {
+        public async Task CreateAsync(Order Order)=> await _orderRepository.CreateAsync(Order);
+      
+        public async Task DeleteAsync(int id)=> await _orderRepository.DeleteAsync(id);
+       
+        public async Task<Order> FindByIdAsync(int? id)=> await _orderRepository.FindByIdAsync(id);
+        
+        public async Task<OrderDetailMeasurement> GetDetailMeasurementById(int oderdetailId, int measurementId)=>
+            await _orderRepository.GetDetailMeasurementById(oderdetailId, measurementId);
+       
+        public async Task<List<OrderDetail>> GetDetailsById(int orderId)=> await _orderRepository.GetDetailsById(orderId);
+       
+        public async Task<List<Order>> GetListAsync()=>await _orderRepository.GetListAsync();
+       
+        public bool IsExists(int id)=> _orderRepository.IsExists(id);
+      
+        public async Task UpdateAsync(Order Order)=> await _orderRepository.UpdateAsync(Order);
+       
+        public async Task UpdateDetailMeasurementAsync(OrderDetailMeasurement item)=> 
             await _orderRepository.UpdateDetailMeasurementAsync(item);
-        }
+    
     }
 }

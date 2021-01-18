@@ -16,18 +16,20 @@ namespace TailorApp.Web.Controllers
     [Authorize(Roles = "Admin")]
     public class IncomesController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IIncomeService _incomeService;
         private readonly IOrderService _orderService;
-
+        private readonly IRentService _rentService;
+        private readonly ISaleService _saleService;
 
         public IncomesController(IIncomeService incomeService,
             IOrderService orderService,
-            ApplicationDbContext context)
+            IRentService rentService,
+            ISaleService saleService)
         {
             _incomeService = incomeService;
             _orderService = orderService;
-            _context = context;
+            _rentService = rentService;
+            _saleService = saleService;
         }
 
         
@@ -50,19 +52,11 @@ namespace TailorApp.Web.Controllers
             }
             if (incomeViewModel.Income.RentID!=null)
             {
-                incomeViewModel.Rent =  _context.Rents.Where(o => o.RentID == incomeViewModel.Income.RentID)
-                    .Include(r=>r.RentDetails)
-                    .ThenInclude(s => s.Stock)
-                    .ThenInclude(s => s.Item)
-                    .FirstOrDefault();
+                incomeViewModel.Rent = await _rentService.FindByIdAsync(incomeViewModel.Income.RentID);
             }
             if (incomeViewModel.Income.SalesID != null)
             {
-                incomeViewModel.Sales =  _context.Sales.Where(o => o.SalesID == incomeViewModel.Income.SalesID)
-                    .Include(s=>s.SalesItems)
-                    .ThenInclude(s=>s.Stock)
-                    .ThenInclude(s=>s.Item)
-                    .FirstOrDefault();
+                incomeViewModel.Sales = await _saleService.FindByIdAsync(incomeViewModel.Income.SalesID);
             }
             return View(incomeViewModel);
         }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.InventoryModel;
 using TailorApp.Domain.Entities.RentModel;
@@ -16,27 +17,33 @@ namespace TailorApp.Web.Controllers.Rent
 {
     public class RentReturnController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        public RentReturnController(ApplicationDbContext context)
+        private readonly IRentReturnService _rentReturnService;
+        private readonly IRentService _rentService;
+        private readonly IStockService _stockService;
+        private readonly IIncomeService _incomeService;
+        public RentReturnController(IRentReturnService rentReturnService,
+            IRentService rentService,
+            IStockService stockService,
+            IIncomeService incomeService)
         {
-            _context = context;
+            _rentReturnService = rentReturnService;
+            _rentService = rentService;
+            _stockService = stockService;
+            _incomeService = incomeService;
         }
         [Authorize]
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            return View(await _context.RentReturns.ToListAsync());
+            var rents = await _rentReturnService.GetListAsync();
+            return View(rents);
         }
 
         [Authorize(Roles = "Admin,Manager")]
         [HttpGet]
         public async Task<ActionResult> ReturnDetails(int id)
         {
-            var returnDetails = await _context.RentReturns
-                .Include(r => r.RentReturnDetails)
-                .Where(r => r.RentReturnID == id)
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
+            var returnDetails = await _rentReturnService.FindByIdAsync(id);
             return PartialView(returnDetails);
         }
 
@@ -44,12 +51,7 @@ namespace TailorApp.Web.Controllers.Rent
         [HttpGet]
         public async Task<IActionResult> Returns(int id)
         {
-            r.Rent model = await _context.Rents
-                .Include(e => e.RentDetails)
-                .ThenInclude(e => e.Stock)
-                .ThenInclude(e => e.Item)
-                .FirstOrDefaultAsync(m => m.RentID == id);
-
+            r.Rent model = await _rentService.FindByIdAsync(id);
           
             if (model == null)
             {
@@ -65,11 +67,11 @@ namespace TailorApp.Web.Controllers.Rent
         {
             bool status = true;
            
-                List<r.RentReturnDetail> details = new List<r.RentReturnDetail>();
+            List<r.RentReturnDetail> rentReturnDetails = new List<r.RentReturnDetail>();
             var rentDetail = new RentDetail();
             var counter = Convert.ToInt32(coll["counter"]);
 
-            //attributes required for SalesReturn
+            //attributes required for RentReturn
             decimal total = Convert.ToDecimal(coll["SubTotal"]);
             decimal discount = Convert.ToDecimal(coll["Discount"]);
             decimal netTotal = Convert.ToDecimal(coll["NetTotal"]);
@@ -90,50 +92,46 @@ namespace TailorApp.Web.Controllers.Rent
                         Amount = Convert.ToDecimal(coll["Amount_" + i])
                     };
                     int rentDetailID = Convert.ToInt32(coll["RentDetailID_"+i]);
-                     rentDetail = _context.RentDetails.Find(rentDetailID);
+                    rentDetail =await _rentService.FindDetailByIdAsync(rentDetailID);
                     rentDetail.ReturnQuantity -= Convert.ToInt32(coll["Qty_" + i]);
-                    details.Add(rentReturnDetail);
+                    rentReturnDetails.Add(rentReturnDetail);
                 }
             }
             if (rentDetail.ReturnQuantity >= 0)
             {
-                foreach (var item in details)
+                foreach (var item in rentReturnDetails)
                 {
                     Stock stock = new Stock();
-                    stock = _context.Stocks.Find(item.StockID);
+                    stock =await _stockService.FindByIdAsync(item.StockID);
                     stock.Quantity += item.Quantity;
 
                 }
 
                 //populating rent Return
-                r.RentReturn _rentReturn = new r.RentReturn
+                r.RentReturn rentReturn = new r.RentReturn
                 {
                     RentID = rentID,
                     Subtotal = total,
                     Discount = discount,
                     NetTotal = netTotal,
-                    RentReturnDetails = details,
+                    RentReturnDetails = rentReturnDetails,
                     Description = "n/a",
                     ReturnedDate = DateTime.Today
                 };
-                UpdateRent(rentID, netTotal);
+                await _rentReturnService.CreateAsync(rentReturn);
 
-                _context.RentReturns.Add(_rentReturn);
-                _context.SaveChanges();
-                try
-                {
-                    foreach (var item in details)
-                    {
-                        item.RentReturnID = _rentReturn.RentReturnID;
-                        _context.RentReturnDetails.Update(item);
+                //update rent
+                var rent =await _rentService.FindByIdAsync(rentID);
+                rent.Paid += netTotal;
+                rent.IsPaid = (rent.Paid == rent.GrandTotal) ? true : false;
 
-                    }
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    var msg = ex.Message;
-                }
+                await _rentService.UpdateAsync(rent);
+                
+                //update income
+                var income =await _incomeService.GetByRentId(rent.RentID);
+                income.Price += rent.Paid;
+                await _incomeService.UpdateAsync(income);
+                
 
                 return new JsonResult(new { Data = new { status = status, message = "Order Added Successfully" } });
             }
@@ -143,25 +141,6 @@ namespace TailorApp.Web.Controllers.Rent
         }
 
 
-        //private methods
-        private void UpdateRent(int rentID, decimal price)
-        {
-            var rent = _context.Rents.Where(x => x.RentID == rentID).FirstOrDefault();
-            rent.Paid +=price ;
-            rent.IsPaid = (rent.Paid == rent.GrandTotal) ? true : false;
-            UpdateIncome(rent.RentID, rent.Paid);
-
-            _context.Update(rent);
-            _context.SaveChanges();
-        }
-        private void UpdateIncome(int rentID, decimal price)
-        {
-            var income = _context.Incomes.Where(x => x.RentID == rentID).FirstOrDefault();
-            income.Price += price;
-
-            _context.Update(income);
-            _context.SaveChanges();
-        }
     }
 
 }

@@ -13,5 +13,8 @@ namespace TailorApp.Application.Services
         Task<List<Sales>> GetListAsync();
         Task<Sales> FindByIdAsync(int? id);
         Task CreateAsync(Sales sale);
+        object GetByYearAndMonth(int year, int month);
+        Task<List<Sales>> GetByDateAsync(DateTime date);
+        object GetByYear(int year);
     }
 }

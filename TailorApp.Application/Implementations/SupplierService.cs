@@ -18,39 +18,19 @@ namespace TailorApp.Application.Implementations
             _supplierRepository = supplierRepository;
         }
 
-        public async Task CreateAsync(Supplier Supplier)
-        {
-            await _supplierRepository.CreateAsync(Supplier);
-        }
+        public async Task CreateAsync(Supplier Supplier)=> await _supplierRepository.CreateAsync(Supplier);
 
-        public async Task DeleteAsync(int id )
-        {
-            await _supplierRepository.DeleteAsync(id);
-        }
-
-        public async Task<Supplier> FindByIdAsync(int? id)
-        {
-            return await _supplierRepository.FindByIdAsync(id);
-        }
-
-        public async Task<List<Supplier>> GetListAsync()
-        {
-            return await _supplierRepository.GetListAsync();
-        }
-
-        public async Task<SelectList> GetSelectListAsync(int? selectedSupplierId)
-        {
-            return await _supplierRepository.GetSelectListAsync(selectedSupplierId);
-        }
-
-        public bool IsExists(int id)
-        {
-            return _supplierRepository.IsExists(id);
-        }
-
-        public async Task UpdateAsync(Supplier Supplier)
-        {
-            await _supplierRepository.UpdateAsync(Supplier);
-        }
+        public async Task DeleteAsync(int id )=> await _supplierRepository.DeleteAsync(id);
+       
+        public async Task<Supplier> FindByIdAsync(int? id)=> await _supplierRepository.FindByIdAsync(id);
+        public async Task<List<Supplier>> GetListAsync()=> await _supplierRepository.GetListAsync();
+       
+        public async Task<SelectList> GetSelectListAsync(int? selectedSupplierId)=> 
+            await _supplierRepository.GetSelectListAsync(selectedSupplierId);
+       
+        public bool IsExists(int id)=> _supplierRepository.IsExists(id);
+       
+        public async Task UpdateAsync(Supplier Supplier)=> await _supplierRepository.UpdateAsync(Supplier);
+     
     }
 }

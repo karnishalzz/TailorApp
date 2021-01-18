@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
 using p = TailorApp.Domain.Entities.RentModel;
@@ -15,23 +16,18 @@ namespace TailorApp.Web.Controllers.Rent
     [Authorize]
     public class RentsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRentService _rentService;
 
-        public RentsController(ApplicationDbContext context)
+        public RentsController(IRentService rentService)
         {
-            _context = context;
+            _rentService = rentService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Rents
-                .Include(r => r.Customer)
-                .Include(r => r.RentDetails)
-                .Include(r=>r.RentReturns)
-                .ThenInclude(r=>r.RentReturnDetails);
-           
-            return View(await applicationDbContext.ToListAsync());
+            var rents =await _rentService.GetListAsync();
+            return View(rents);
         }
 
         

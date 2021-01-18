@@ -18,37 +18,19 @@ namespace TailorApp.Application.Implementations
             _itemRepository = itemRepository;
         }
 
-        public async Task CreateAsync(Item Item)
-        {
-            await _itemRepository.CreateAsync(Item);
-        }
+        public async Task CreateAsync(Item Item) => await _itemRepository.CreateAsync(Item);
 
-        public async Task DeleteAsync(Item Item)
-        {
-            await _itemRepository.DeleteAsync(Item);
-        }
+        public async Task DeleteAsync(Item Item) => await _itemRepository.DeleteAsync(Item);
 
-        public async Task<Item> FindByIdAsync(int? id)
-        {
-            return await _itemRepository.FindByIdAsync(id);
-        }
+        public async Task<Item> FindByIdAsync(int? id) => await _itemRepository.FindByIdAsync(id);
 
-        public async Task<List<Item>> GetListAsync()
-        {
-            return await _itemRepository.GetListAsync();
-        }
-        public async Task<SelectList> GetSelectListAsync(int? selectedItemId = null)
-        {
-            return await _itemRepository.GetSelectListAsync(selectedItemId);
-        }
-        public bool IsExists(int id)
-        {
-            return _itemRepository.IsExists(id);
-        }
+        public async Task<List<Item>> GetListAsync() => await _itemRepository.GetListAsync();
 
-        public async Task UpdateAsync(Item Item)
-        {
-            await _itemRepository.UpdateAsync(Item);
-        }
+        public async Task<SelectList> GetSelectListAsync(int? selectedItemId = null) =>
+            await _itemRepository.GetSelectListAsync(selectedItemId);
+
+        public bool IsExists(int id) => _itemRepository.IsExists(id);
+
+        public async Task UpdateAsync(Item Item) => await _itemRepository.UpdateAsync(Item);
     }
 }

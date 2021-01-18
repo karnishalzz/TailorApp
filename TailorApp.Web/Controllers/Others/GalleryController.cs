@@ -16,19 +16,20 @@ namespace TailorApp.Web.Controllers
     [Authorize]
     public class GalleryController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IProductService _productService;
-     
-        public GalleryController(ApplicationDbContext context,IProductService productService)
-        {
-            _context = context;
+        private readonly IStockService _stockService;
+
+        public GalleryController(IProductService productService,
+             IStockService stockService)
+        { 
             _productService = productService;
+            _stockService = stockService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var viewModel = new GalleryViewModel();
-            viewModel.Stocks = await _context.Stocks.Include(s => s.Item).AsNoTracking().ToListAsync();
+            viewModel.Stocks = await _stockService.GetListAsync();
             viewModel.Products = await _productService.GetListAsync();
             return View(viewModel);
         }

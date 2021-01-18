@@ -36,6 +36,38 @@ namespace TailorApp.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<Sales>> GetByDateAsync(DateTime date)
+        {
+           return await _context.Sales
+                .Where(x => x.Date.Date == date.Date)
+                .ToListAsync();
+        }
+
+        public object GetByYear(int year)
+        {
+            return _context.Sales
+                .Where(x => x.Date.Year == year)
+                .OrderBy(x => x.Date.Month)
+                .Select(g => new
+                {
+                    Month = g.Date.Month,
+                    Total = g.GrandTotal
+                });
+        }
+
+        public object GetByYearAndMonth(int year, int month)
+        {
+            return _context.Sales
+            .Where(x => x.Date.Year == year && x.Date.Month == month)
+            .OrderBy(x => x.Date)
+            .Select(g => new
+                {
+                    Day = g.Date.Day,
+                    Total = g.GrandTotal
+                });
+            
+        }
+
         public async Task<List<Sales>> GetListAsync()
         {
             return await _context.Sales

@@ -24,7 +24,7 @@ namespace TailorApp.Application.Implementations
 
         public async Task<Income> GetByOrderId(int orderId)=> await _incomeRepository.GetByOrderId(orderId);
 
-
+        public async Task<Income> GetByRentId(int rentId) =>await _incomeRepository.GetByRentId(rentId);
         public async Task<List<Income>> GetListAsync()=> await _incomeRepository.GetListAsync();
         
         public async Task UpdateAsync(Income income)=>await _incomeRepository.UpdateAsync(income);

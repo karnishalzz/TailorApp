@@ -26,8 +26,12 @@ namespace TailorApp.Infrastructure.Data.Repositories
         public async Task<Income> GetByOrderId(int orderId)
         {
             return await _context.Incomes
-                .Where(x=>x.OrderID == orderId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(x => x.OrderID == orderId);
+        }
+        public async Task<Income> GetByRentId(int rentId)
+        {
+            return await _context.Incomes
+                .FirstOrDefaultAsync(x => x.RentID == rentId);
         }
 
         public async Task<List<Income>> GetListAsync()
@@ -47,5 +51,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context.Incomes.Add(income);
             await _context.SaveChangesAsync();
         }
+
+        
     }
 }

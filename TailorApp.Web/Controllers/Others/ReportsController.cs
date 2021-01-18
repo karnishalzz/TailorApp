@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
 using TailorApp.Web.ViewModels.Reports;
@@ -15,21 +16,23 @@ namespace TailorApp.Web.Controllers.Others
     [Authorize]
     public class ReportsController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        public ReportsController(ApplicationDbContext context)
+      
+        private readonly IStockService _stockService;
+        private readonly ISaleService _saleService;
+
+        public ReportsController(
+            IStockService stockService,
+            ISaleService saleService)
         {
-            _context = context;
+            _stockService = stockService;
+            _saleService=saleService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Stocks()
         {
-            var stock = await _context.Stocks
-                .Include(s => s.Item)
-                .Include(s => s.Purchase)
-                .AsNoTracking()
-                .ToListAsync();
-            return View(stock);
+            var stocks = await _stockService.GetListAsync();
+            return View(stocks);
         }
 
         [HttpGet]
@@ -37,9 +40,7 @@ namespace TailorApp.Web.Controllers.Others
         {
             ViewData["msg"] = "showing results from date " + fromDate + " to " + toDate;
 
-            var stock = await _context.Stocks
-                .Include(s => s.Item)
-                .Include(s => s.Purchase).ToListAsync();
+            var stock = await _stockService.GetListAsync();
             if (!String.IsNullOrEmpty(fromDate) && !String.IsNullOrEmpty(toDate))
             {
                 var from = Convert.ToDateTime(fromDate);
@@ -70,15 +71,13 @@ namespace TailorApp.Web.Controllers.Others
                 i = -1;
                 ViewData["msg"] = "showing results for past month";
             }
-                var stock = await _context.Stocks
-                .Include(s => s.Item)
-                .Include(s => s.Purchase).ToListAsync();
+            var stocks = await _stockService.GetListAsync();
             if (!String.IsNullOrEmpty(option))
             {
-                stock = stock.Where(x =>DateTime.Compare(x.Purchase.Date, DateTime.Today.AddMonths(i)) >= 0).ToList();
+                stocks = stocks.Where(x =>DateTime.Compare(x.Purchase.Date, DateTime.Today.AddMonths(i)) >= 0).ToList();
             }
 
-            return View( "Stocks", stock);
+            return View( "Stocks", stocks);
         }
         [HttpGet]
         public ActionResult MonthlySalesByDate()
@@ -87,11 +86,8 @@ namespace TailorApp.Web.Controllers.Others
             int month = 12;
             int daysInMonth = DateTime.DaysInMonth(year, month);
             var days = Enumerable.Range(1, daysInMonth);
-            var query = _context.Sales.Where(x => x.Date.Year == year && x.Date.Month == month).OrderBy(x => x.Date).Select(g => new
-            {
-                Day = g.Date.Day,
-                Total = g.GrandTotal
-            });
+          
+            var query = (IQueryable<DatTotalViewModel>)_saleService.GetByYearAndMonth(year, month);
             var model = new SalesViewModel
             {
                 Date = new DateTime(year, month, 1),
@@ -122,11 +118,7 @@ namespace TailorApp.Web.Controllers.Others
             //calculate ttal number of days in a particular month for a that year 
             int daysInMonth = DateTime.DaysInMonth(year, month);
             var days = Enumerable.Range(1, daysInMonth);
-            var query = _context.Sales.Where(x => x.Date.Year == year && x.Date.Month == month).OrderBy(x => x.Date.Day).Select(g => new
-            {
-                Day = g.Date.Day,
-                Total = g.GrandTotal
-            });
+            var query =(IQueryable<DatTotalViewModel>) _saleService.GetByYearAndMonth(year,month);
             var model = new SalesViewModel
             {
                 Date = new DateTime(year, month, 1),
@@ -141,13 +133,13 @@ namespace TailorApp.Web.Controllers.Others
         [HttpGet]
         public ActionResult DailySales()
         {
-            var list = _context.Sales.Where(x =>x.Date.Date== DateTime.Now.Date).ToList();
+            var list = _saleService.GetByDateAsync(DateTime.Now);
             return View(list);
         }
         [HttpGet]
         public ActionResult DailySalesFor(DateTime getDate)
         {
-            var list = _context.Sales.Where(x =>x.Date.Date==getDate.Date).ToList();
+            var list = _saleService.GetByDateAsync(getDate);
             return PartialView("_DailySalesPartialView", list);
         }
         [HttpGet]
@@ -157,11 +149,7 @@ namespace TailorApp.Web.Controllers.Others
             int monthInYear = 12;
             var months = Enumerable.Range(1, monthInYear);
 
-            var query = _context.Sales.Where(x => x.Date.Year == year).OrderBy(x => x.Date.Month).Select(g => new
-            {
-                Month = g.Date.Month,
-                Total = g.GrandTotal
-            });
+            var query =(IQueryable<MonthTotalViewModel>) _saleService.GetByYear(year);
             var model = new YearSalesViewModel
             {
                 Date = new DateTime(year, 1, 1),
@@ -184,11 +172,7 @@ namespace TailorApp.Web.Controllers.Others
 
             int monthInYear = 12;
             var months = Enumerable.Range(1, monthInYear);
-            var query = _context.Sales.Where(x => x.Date.Year == year).OrderBy(x => x.Date.Month).Select(g => new
-            {
-                Month = g.Date.Month,
-                Total = g.GrandTotal
-            });
+            var query = (IQueryable<MonthTotalViewModel>)_saleService.GetByYear(year);
             var model = new YearSalesViewModel
             {
                 Date= new DateTime(year,1,1),

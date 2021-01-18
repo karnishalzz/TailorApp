@@ -17,34 +17,12 @@ namespace TailorApp.Application.Implementations
             _productRepository = productRepository;
         }
 
-        public async Task CreateAsync(Product Product)
-        {
-            await _productRepository.CreateAsync(Product);
-        }
-
-        public async Task DeleteAsync(Product product)
-        {
-            await _productRepository.DeleteAsync(product);
-        }
-
-        public async Task<Product> FindByIdAsync(int? id)
-        {
-            return await _productRepository.FindByIdAsync(id);
-        }
-
-        public async Task<List<Product>> GetListAsync()
-        {
-            return await _productRepository.GetListAsync();
-        }
-
-        public bool IsExists(int id)
-        {
-            return _productRepository.IsExists(id);
-        }
-
-        public async Task UpdateAsync(Product Product)
-        {
-            await _productRepository.UpdateAsync(Product);
-        }
+        public async Task CreateAsync(Product Product)=> await _productRepository.CreateAsync(Product);
+        public async Task DeleteAsync(Product product)=> await _productRepository.DeleteAsync(product);
+        public async Task<Product> FindByIdAsync(int? id)=> await _productRepository.FindByIdAsync(id);
+        public async Task<List<Product>> GetListAsync()=> await _productRepository.GetListAsync();
+        public bool IsExists(int id)=> _productRepository.IsExists(id);
+        public async Task UpdateAsync(Product Product) => await _productRepository.UpdateAsync(Product);
+    
     }
 }
