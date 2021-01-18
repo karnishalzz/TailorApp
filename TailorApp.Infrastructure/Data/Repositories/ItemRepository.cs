@@ -50,7 +50,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
                  .Select(x => new { x.ItemID, x.Name })
                  .OrderBy(x => x.Name)
                  .ToListAsync();
-            return new SelectList(categoryList, "CategoryID", "Name", selectedItemId);
+            return new SelectList(categoryList, "ItemID", "Name", selectedItemId);
         }
         public bool IsExists(int id)
         {

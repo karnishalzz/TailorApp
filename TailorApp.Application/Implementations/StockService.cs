@@ -19,16 +19,21 @@ namespace TailorApp.Application.Implementations
         }
 
 
-        public async Task<List<Stock>> GetListAsync()
-        {
-            return await _stockRepository.GetListAsync();
-        }
+        public async Task<List<Stock>> GetListAsync()=>await _stockRepository.GetListAsync();
+
+
+        public async Task<Stock> FindByIdAsync(int? id)=> await _stockRepository.FindByIdAsync(id);
         
-        public async Task<Stock> FindByIdAsync(int? id)
-        {
-            return await _stockRepository.FindByIdAsync(id);
-        }
 
+        public async Task<List<Stock>> GetByItemCategory(int itemId, CategoryType category) =>
+            await _stockRepository.GetByItemCategory(itemId, category);
 
+        public async Task CreateAsync(Stock stock) => await _stockRepository.CreateAsync(stock);
+
+        public async Task UpdateStockListAsync(List<Stock> stocks) => await _stockRepository.UpdateStockListAsync(stocks);
+
+        public async Task<List<Stock>> GetListByCategoryAsync(CategoryType categoryType) => 
+            await _stockRepository.GetListByCategoryAsync(categoryType);
+       
     }
 }

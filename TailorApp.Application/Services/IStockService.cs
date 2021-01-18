@@ -11,7 +11,11 @@ namespace TailorApp.Application.Services
     public interface IStockService : IScopedService
     {
         Task<List<Stock>> GetListAsync();
+        Task<List<Stock>> GetListByCategoryAsync(CategoryType categoryType);
         Task<Stock> FindByIdAsync(int? id);
-        
+        Task CreateAsync(Stock stock);
+        Task UpdateStockListAsync(List<Stock> stocks);
+        Task<List<Stock>> GetByItemCategory(int itemId, CategoryType category);
+
     }
 }

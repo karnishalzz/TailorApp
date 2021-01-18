@@ -29,5 +29,7 @@ namespace TailorApp.Application.Implementations
         public async Task<PurchaseDetail> FindDetailByIdAsync(int id) =>await _purchaseRepository.FindDetailByIdAsync(id);
 
         public async Task UpdateDetailAsync(PurchaseDetail purchaseDetail) =>await _purchaseRepository.UpdateDetailAsync(purchaseDetail);
+
+        public async Task CreateAsync(Purchase purchase) => await _purchaseRepository.CreateAsync(purchase);
     }
 }

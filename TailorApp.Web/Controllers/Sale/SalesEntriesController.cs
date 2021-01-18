@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.InventoryModel;
 using TailorApp.Domain.Entities.SalesModule;
@@ -16,25 +17,26 @@ namespace TailorApp.Web.Controllers.Sale
     [Authorize]
     public class SalesEntriesController : Controller
     {
-        private readonly ApplicationDbContext _context;
-
-        public SalesEntriesController(ApplicationDbContext context)
+        private readonly IStockService _stockService;
+        private readonly IIncomeService _incomeService;
+        private readonly ISaleService _saleService;
+        public SalesEntriesController(IStockService stockService,
+             IIncomeService incomeService,
+             ISaleService saleService)
         {
-            _context = context;
+            _stockService = stockService;
+            _incomeService = incomeService;
+            _saleService = saleService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            List<Stock> stock = await _context.Stocks
-                .Include(i => i.Item)
-                .Where(i => i.Category == CategoryType.Sale)
-                .AsNoTracking()
-                .ToListAsync();
-            return View(stock);
+            var stocks =await _stockService.GetListByCategoryAsync(CategoryType.Sale);
+            return View(stocks);
         }
 
         [HttpPost]
-        public JsonResult SerializeFormData(IFormCollection _collection)
+        public async Task<JsonResult> SerializeFormData(IFormCollection _collection)
         {
             if (_collection != null)
             {
@@ -51,8 +53,7 @@ namespace TailorApp.Web.Controllers.Sale
                 decimal _grandTotal = Convert.ToDecimal(_collection["GrandTotal"]);
                 string _remarks = _collection["Remarks"].ToString();
 
-                //instance of the global class
-
+                //create sale and saleitems
                 Sales _sales = new Sales()
                 {
                     Date = DateTime.Now,
@@ -60,76 +61,55 @@ namespace TailorApp.Web.Controllers.Sale
                     Discount = _discount,
                     GrandTotal = _grandTotal,
                     Tax = _tax,
-                    Remarks = _remarks
+                    Remarks = _remarks,
+             
                 };
 
-                //insert into sales, sales-items, stock
-                _context.Sales.Add(_sales);
-                _context.SaveChanges();
+                List<SalesDetail> salesDetails = new List<SalesDetail>();
+                int count = _stockID.Count();
+                for (int i = 0; i < count; i++)
+                {
+                    SalesDetail salesDetail = new SalesDetail
+                    {
+                        StockID = Convert.ToInt32(_stockID[i]),
+                        Rate = Convert.ToDecimal(_rate[i]),
+                        Quantity = Convert.ToInt32(_qty[i]),
+                        Amount = Convert.ToDecimal(_amt[i])
+                    };
+                    salesDetails.Add(salesDetail);
+                }
+                _sales.SalesItems = salesDetails;
 
-                InsertSalesItem(_sales.SalesID, _stockID, _qty, _rate, _amt);
-                UpdateStock(_stockID, _qty);
-                UpdateIncome(_grandTotal, _sales.SalesID);
+                await _saleService.CreateAsync(_sales);
+
+                //update stock
+
+                List<Stock> stocks = new List<Stock>();
+                for (int i = 0, y = _stockID.Count(); i < y; i++)
+                {
+                    int stockID = Convert.ToInt32(_stockID[i]);
+                    int getQty = Convert.ToInt32(_qty[i]);
+                    Stock stock = await _stockService.FindByIdAsync(stockID);
+                    stock.Quantity = stock.Quantity - getQty;
+                    stocks.Add(stock);
+                }
+                await _stockService.UpdateStockListAsync(stocks);
+
+                //update income
+                Income income = new Income()
+                {
+                    Date = DateTime.Now,
+                    SalesID = _sales.SalesID,
+                    Name = "Sale",
+                    Description = "-",
+                    Price = _grandTotal
+                };
+                await _incomeService.CreateAsync(income);
 
                 return Json(_sales.SalesID);
-
-
             }
             return Json("null");
         }
-
-
-
-        //private methods
-
-        private void InsertSalesItem(int _salesID, string[] _stockID, string[] _qty, string[] _rate, string[] _amt)
-        {
-            int count = _stockID.Count();
-            for (int i = 0; i < count; i++)
-            {
-                SalesDetail _salesItem = new SalesDetail
-                {
-                    SalesID = _salesID,
-
-                    StockID = Convert.ToInt32(_stockID[i]),
-                    Rate = Convert.ToDecimal(_rate[i]),
-                    Quantity = Convert.ToInt32(_qty[i]),
-                    Amount = Convert.ToDecimal(_amt[i])
-                };
-                _context.SalesDetails.Add(_salesItem);
-                _context.SaveChanges();
-            }
-        }
-
-        private void UpdateStock(string[] _stockID, string[] _qty)
-        {
-            for (int i = 0, y = _stockID.Count(); i < y; i++)
-            {
-                int getStockID = Convert.ToInt32(_stockID[i]);
-                int getQty = Convert.ToInt32(_qty[i]);
-                Stock stock = _context.Stocks.Find(getStockID);
-                stock.Quantity = stock.Quantity - getQty;
-                _context.SaveChanges();
-
-            }
-        }
-
-        private void UpdateIncome(decimal total, int salesID)
-        {
-            Income income = new Income()
-            {
-                Date = DateTime.Now,
-                SalesID = salesID,
-                Name = "Sale",
-                Description = "-",
-                Price = total
-            };
-
-            _context.Incomes.Add(income);
-            _context.SaveChanges();
-        }
-
-
 
     }
 }

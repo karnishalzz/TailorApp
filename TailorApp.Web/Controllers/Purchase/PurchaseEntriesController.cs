@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.InventoryModel;
 using TailorApp.Domain.Entities.PurchaseModel;
@@ -18,17 +19,34 @@ namespace TailorApp.Web.Controllers.PurchaseController
     [Authorize(Roles = "Admin,Manager")]
     public class PurchaseEntriesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IItemService _itemService;
+        private readonly ISupplierService _supplierService;
+        private readonly IPurchaseService _purchaseService;
+        private readonly IExpenseService _expenseService;
+        private readonly IStockService _stockService;
 
-        public PurchaseEntriesController(ApplicationDbContext context)
+        public PurchaseEntriesController(IItemService itemService,
+            ISupplierService supplierService,
+            IPurchaseService purchaseService,
+            IExpenseService expenseService,
+            IStockService stockService)
         {
-            _context = context;
+            _itemService = itemService;
+            _supplierService = supplierService;
+            _purchaseService = purchaseService;
+            _expenseService = expenseService;
+            _stockService = stockService;
+           
         }
        [HttpGet]
-        public ActionResult Index()
+        public async Task<ActionResult> IndexAsync()
         {
-            PopulateSupplierDropDownList();
-            PopulateItemDropDownList();
+            SelectList itemSelectList = await _itemService.GetSelectListAsync();
+            ViewBag.ItemID = itemSelectList;
+
+            SelectList supplierSelectList = await _supplierService.GetSelectListAsync();
+            ViewBag.SupplierID = supplierSelectList;
+           
             return View();
         }
         
@@ -40,10 +58,8 @@ namespace TailorApp.Web.Controllers.PurchaseController
             {
                 if (p != null)
                 {
-                    //new purchase object using the data from the viewmodel : PurchaseEntryVM
                     Purchase purchase = new Purchase
-                    {
-
+                    { 
                         Date = p.Date,
                         SupplierID = p.SupplierID,
                         Amount = p.Amount,
@@ -53,36 +69,36 @@ namespace TailorApp.Web.Controllers.PurchaseController
                         Description = p.Description,
                         LastUpdated = DateTime.Now
                     };
-                   
-
-                    
-                    _context.Add(purchase);
-                    await _context.SaveChangesAsync();
-                    int purchaseID = _context.Purchases.Max(o => o.PurchaseID);
-                    UpdateExpense(purchase.GrandTotal, purchaseID);
-
-                    var purchaseDetailList = new List<PurchaseDetail>();
-                    foreach (var i in p.PurchaseDetails)
+                    List<PurchaseDetail> purchaseDetails=new List<PurchaseDetail>();
+                    foreach(var i in p.PurchaseDetails)
                     {
-                        i.PurchaseID = purchaseID;
-                        _context.Add(i);
-                        await _context.SaveChangesAsync();
-                        int purchaseDetailID = _context.PurchaseDetails.Max(o => o.PurchaseDetailID);
-                        i.PurchaseDetailID = purchaseDetailID;
-                        purchaseDetailList.Add(i);
+                        purchaseDetails.Add(i);
                     }
-                    
+                    purchase.PurchaseDetails = purchaseDetails;
 
-                    foreach (var item in purchaseDetailList)
+                    await _purchaseService.CreateAsync(purchase);
+
+                    Expense expense = new Expense()
                     {
-                        InsertOrUpdateInventory(item);
+                        Date = DateTime.Now,
+                        PurchaseID = purchase.PurchaseID,
+                        Type = ExpenseType.Purchase,
+                        Description = "n/a",
+                        Price = purchase.GrandTotal
+                    };
+
+                    await _expenseService.CreateAsync(expense);
+
+                   
+                    foreach (var item in p.PurchaseDetails)
+                    {
+                        await InsertOrUpdateInventory(item);
                     }
 
                 
 
                 }
            
-                //if everything is sucessful, set status to true.
                 status = true;
             }
             catch(DbUpdateException ex)
@@ -93,98 +109,45 @@ namespace TailorApp.Web.Controllers.PurchaseController
             return new JsonResult(new { Data = new { status = status } });
         }
 
-        [HttpPost]
-        public void InsertOrUpdateInventory(PurchaseDetail purchaseDetail)
+
+        private async Task InsertOrUpdateInventory(PurchaseDetail purchaseDetail)
         {
-            var _stock = new Stock();
-               
-
-                _stock.ItemID = purchaseDetail.ItemID;
-                _stock.CostPrice = purchaseDetail.CostPrice;
-                _stock.SellingPrice = purchaseDetail.SellingPrice;
-                _stock.PurchaseID = purchaseDetail.PurchaseID;
-               _stock.Category =(CategoryType)Enum.Parse(typeof(CategoryType), purchaseDetail.Category);
-
-
-
-               List<Stock> _checkItem = (from s in _context.Stocks
-                                          where s.ItemID == purchaseDetail.ItemID && 
-                                          s.Category == _stock.Category
-                                          select s).ToList();
-
-                //count the number of exixting record on inserted item
-                int countStock = _checkItem.Count();
-
-                //Add new record if record is not found
-                if (countStock == 0)
+            var stock = new Stock
+            {
+                ItemID = purchaseDetail.ItemID,
+                CostPrice = purchaseDetail.CostPrice,
+                SellingPrice = purchaseDetail.SellingPrice,
+                PurchaseID = purchaseDetail.PurchaseID,
+                Category = (CategoryType)Enum.Parse(typeof(CategoryType), purchaseDetail.Category)
+            };
+            var existingStocks = await _stockService.GetByItemCategory(purchaseDetail.ItemID, stock.Category);
+            if (existingStocks.Count() == 0)
+            {
+                stock.Quantity = purchaseDetail.Quantity;
+                stock.InitialQuantity = stock.Quantity;
+                await _stockService.CreateAsync(stock);
+            }
+            else
+            {
+                int count = 0;
+                foreach (var item in existingStocks)
                 {
-                //Add new item with new Initial qty
-                _stock.Quantity = purchaseDetail.Quantity;
-                _stock.InitialQuantity = _stock.Quantity;
-                _context.Stocks.Add(_stock);
-                _context.SaveChanges();
+                    if (item.CostPrice == purchaseDetail.CostPrice)
+                    {
+                        item.Quantity += purchaseDetail.Quantity;
+                        item.InitialQuantity += stock.Quantity;
+                        break;
+                    }
+                    count++;
                 }
-                else
+                if (count == existingStocks.Count())
                 {
-                    //to check how many times loop executes completely 
-                    int loopCount = 0;
-                    //Check and Add or update
-                    foreach (var stock in _checkItem)
-                    {
-                        if (stock.CostPrice == purchaseDetail.CostPrice)
-                        {
-                            //Update qty and InitialQty 
-                            stock.Quantity += purchaseDetail.Quantity;
-                            stock.InitialQuantity += purchaseDetail.Quantity;
-                            _context.SaveChanges();
-                            break;
-                        }
-                        loopCount++;
-                    }
-                    if (loopCount == _checkItem.Count())
-                    {
-                    //Add new record with Qty and intial Qty
-                    _stock.Quantity = purchaseDetail.Quantity;
-                    _stock.InitialQuantity += purchaseDetail.Quantity;
-                        _context.Stocks.Add(_stock);
-                        _context.SaveChanges();
-                    }
+                    await _stockService.UpdateStockListAsync(existingStocks);
                 }
             }
-
-
-
-        //private methods
-
-        private void UpdateExpense(decimal total, int purchaseID)
-        {
-            Expense expense = new Expense()
-            {
-                Date = DateTime.Now,
-                PurchaseID = purchaseID,
-                Type=ExpenseType.Purchase,
-                Description = "n/a",
-                Price = total
-            };
-
-            _context.Expenses.Add(expense);
-            _context.SaveChanges();
-        }
-        private void PopulateSupplierDropDownList(object selectedSupplier = null)
-        {
-            var suppliersQuery = from d in _context.Suppliers
-                                 orderby d.Name
-                                 select d;
-            ViewBag.SupplierID = new SelectList(suppliersQuery.AsNoTracking(), "SupplierID", "Name", selectedSupplier);
         }
 
-        private void PopulateItemDropDownList(object selectedItem = null)
-        {
-            var itemQuery = from d in _context.Items
-                            orderby d.Name
-                            select d;
-            ViewBag.ItemID = new SelectList(itemQuery.AsNoTracking(), "ItemID", "Name", selectedItem);
-        }
+    
     }
     
 }

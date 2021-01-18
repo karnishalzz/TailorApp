@@ -13,6 +13,7 @@ namespace TailorApp.Application.Services
         Task<List<Purchase>> GetListAsync();
         bool DetailIsExists(int id);
         Task<Purchase> FindByIdAsync(int? id);
+        Task CreateAsync(Purchase purchase);
         Task UpdateAsync(Purchase purchase);
         Task<PurchaseDetail> FindDetailByIdAsync(int id);
         Task UpdateDetailAsync(PurchaseDetail purchaseDetail);

@@ -13,6 +13,7 @@ namespace TailorApp.Domain.Repositories
         IQueryable<Purchase> Purchases { get; }
         Task<List<Purchase>> GetListAsync();
         Task<Purchase> FindByIdAsync(int? id);
+        Task CreateAsync(Purchase purchase);
         Task UpdateAsync(Purchase purchase);
         bool DetailIsExists(int id);
         Task<PurchaseDetail> FindDetailByIdAsync(int id);

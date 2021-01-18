@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,11 @@ namespace TailorApp.Application.Implementations
         public async Task<List<Supplier>> GetListAsync()
         {
             return await _supplierRepository.GetListAsync();
+        }
+
+        public async Task<SelectList> GetSelectListAsync(int? selectedSupplierId)
+        {
+            return await _supplierRepository.GetSelectListAsync(selectedSupplierId);
         }
 
         public bool IsExists(int id)

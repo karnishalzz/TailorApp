@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +55,13 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
             _context.Suppliers.Update(Supplier);
             await _context.SaveChangesAsync();
+        }
+        public async Task<SelectList> GetSelectListAsync(int? selectedSupplierId)
+        {
+            var supplierList = await _context.Suppliers.Select(c => new { c.SupplierID, c.Name })
+                .OrderBy(c => c.Name).ToListAsync();
+
+            return new SelectList(supplierList, "SupplierID", "Name", selectedSupplierId);
         }
     }
 }

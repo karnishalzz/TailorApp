@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.SalesModule;
 using TailorApp.Infrastructure.Data;
@@ -15,28 +16,24 @@ namespace TailorApp.Web.Controllers.Sale
 
     public class SalesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ISaleService _saleService;
 
-        public SalesController(ApplicationDbContext context)
+        public SalesController(ISaleService saleService)
         {
-            _context = context;
+            _saleService = saleService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Sales.ToListAsync());
+            var sales = await _saleService.GetListAsync();
+            return View(sales);
         }
 
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
-            var model = await _context.Sales
-                .Include(e => e.SalesItems)
-                .ThenInclude(e => e.Stock)
-                .ThenInclude(e => e.Item)
-                .FirstOrDefaultAsync(m => m.SalesID == id);
-
+            var model = await _saleService.FindByIdAsync(id);
 
             if (model == null)
             {
@@ -46,60 +43,6 @@ namespace TailorApp.Web.Controllers.Sale
             return View(model);
         }
 
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var sales = await _context.Sales.FindAsync(id);
-            if (sales == null)
-            {
-                return NotFound();
-            }
-            return View(sales);
-        }
-
         
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SalesID,Date,Amount,Discount,Tax,GrandTotal,Remarks")] Sales sales)
-        {
-            if (id != sales.SalesID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(sales);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SalesExists(sales.SalesID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return Redirect("~/Sales/Index/");
-            }
-            return View(sales);
-        }
-
-        private bool SalesExists(int id)
-        {
-            return _context.Sales.Any(e => e.SalesID == id);
-        }
     }
 }

@@ -38,5 +38,32 @@ namespace TailorApp.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<Stock>> GetByItemCategory(int itemId, CategoryType category)
+        {
+            return await _context.Stocks
+                .Where(x => x.ItemID == itemId && x.Category == category)
+                .ToListAsync();
+               
+        }
+
+        public async Task CreateAsync(Stock stock)
+        {
+            _context.Add(stock);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateStockListAsync(List<Stock> stocks)
+        {
+            _context.UpdateRange(stocks);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Stock>> GetListByCategoryAsync(CategoryType categoryType)
+        {
+          return await _context.Stocks
+                .Where(x=>x.Category==categoryType)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

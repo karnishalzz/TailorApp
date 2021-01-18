@@ -59,5 +59,12 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context.PurchaseDetails.UpdateRange(purchaseDetail);
             await _context.SaveChangesAsync();
         }
+
+        public async Task CreateAsync(Purchase purchase)
+        {
+            _context.AddRange(purchase);
+            await _context.SaveChangesAsync();
+        }
+        
     }
 }

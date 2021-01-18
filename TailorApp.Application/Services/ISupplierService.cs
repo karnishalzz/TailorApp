@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace TailorApp.Application.Services
     public interface ISupplierService: IScopedService
     {
         Task<List<Supplier>> GetListAsync();
+        Task<SelectList> GetSelectListAsync(int? selectedSupplierId=null);
         bool IsExists(int id);
         Task<Supplier> FindByIdAsync(int? id);
         Task CreateAsync(Supplier Supplier);

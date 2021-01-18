@@ -85,7 +85,7 @@ namespace TailorApp.Web.Controllers.StockController
             if (ModelState.IsValid)
             {
                 item.LastUpdated = DateTime.Now;
-                _itemService.CreateAsync(item);
+                await _itemService.CreateAsync(item);
                 return Redirect("~/Items/Index/");
             }
 
