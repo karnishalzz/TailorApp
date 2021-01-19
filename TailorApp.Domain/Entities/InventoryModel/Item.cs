@@ -25,7 +25,7 @@ namespace TailorApp.Domain.Entities.InventoryModel
 
         [Display(Name = "Last Update(YYYY-MM-DD)")]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime? LastUpdated { get; set; }
+        public DateTime LastUpdated { get; set; }
 
         public string ImagePath { get; set; }
 

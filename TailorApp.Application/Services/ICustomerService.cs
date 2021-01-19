@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Domain.Entities;
 using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 
@@ -15,5 +16,6 @@ namespace TailorApp.Application.Services
         Task CreateAsync(Customer customer);
         Task UpdateAsync(Customer customer);
         Task DeleteAsync(Customer customer);
+        Task<object> GetDataTableAsync(DataTableDto dataTableDto);
     }
 }

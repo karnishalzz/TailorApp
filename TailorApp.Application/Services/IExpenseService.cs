@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Domain.Entities;
 using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 

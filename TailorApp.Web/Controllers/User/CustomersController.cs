@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.Base;
@@ -30,10 +31,16 @@ namespace TailorApp.Web.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var customers =await _customerService.GetListAsync();
-            return View(customers);
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> LoadCustomerList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _customerService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
         }
 
         [HttpGet]

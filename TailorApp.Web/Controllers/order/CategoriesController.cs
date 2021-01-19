@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
@@ -31,9 +32,16 @@ namespace TailorApp.Web.Controllers
         {
             var categories = await _categoryService.GetListAsync();
             return View(categories);
+            //return View();
+        }
+        [HttpPost]
+        public async Task<JsonResult> LoadCategoryList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _categoryService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
         }
 
-        
+
 
         [HttpGet]
         public async Task<IActionResult> CreateAsync()

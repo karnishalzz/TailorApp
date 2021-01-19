@@ -17,6 +17,8 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = dbContext;
         }
 
+        public IQueryable<Customer> Customers => _context.Customers.AsQueryable();
+
         public async Task CreateAsync(Customer customer)
         {
             _context.Customers.Add(customer);

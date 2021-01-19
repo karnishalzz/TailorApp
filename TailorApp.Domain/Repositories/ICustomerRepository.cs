@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TailorApp.Domain.Entities;
@@ -8,6 +9,7 @@ namespace TailorApp.Domain.Repositories
 {
     public interface ICustomerRepository : IScopedService
     {
+        IQueryable<Customer> Customers { get; }
         Task<SelectList> GetSelectListAsync(int? selectedCustomerId);
         Task<List<Customer>> GetListAsync();
         bool IsExists(int id);

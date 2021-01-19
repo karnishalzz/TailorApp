@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.Base;
@@ -32,11 +33,17 @@ namespace TailorApp.Web.Controllers.StockController
 
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var items = await _itemService.GetListAsync();
-            return View(items);
+            return View();
         }
+        [HttpPost]
+        public async Task<JsonResult> LoadItemList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _itemService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
