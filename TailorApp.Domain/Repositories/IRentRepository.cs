@@ -12,6 +12,8 @@ namespace TailorApp.Domain.Repositories
     public interface IRentRepository : IScopedService
     {
         IQueryable<Rent> Rents { get; }
+        int Total { get; }
+        int Monthly { get; }
         Task<List<Rent>> GetListAsync();
         Task CreateAsync(Rent rent);
         Task UpdateAsync(Rent rent);

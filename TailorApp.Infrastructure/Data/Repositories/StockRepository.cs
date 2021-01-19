@@ -62,6 +62,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
           return await _context.Stocks
                 .Where(x=>x.Category==categoryType)
+                .Include(x=>x.Item)
                 .OrderBy(i => i.Item.Name)
                 .AsNoTracking()
                 .ToListAsync();

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
 
@@ -16,13 +17,24 @@ namespace TailorApp.Web.Controllers
     public class HomeController : Controller
     {
         
-        private readonly ApplicationDbContext _context;
+        private readonly IOrderService _orderService;
+        private readonly ISaleService _saleService;
+        private readonly IRentService _rentService;
+        private readonly IIncomeService _incomeService;
+
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public HomeController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager)
+        public HomeController(SignInManager<IdentityUser> signInManager,
+            IOrderService orderService,
+            ISaleService saleService,
+            IRentService rentService,
+            IIncomeService incomeService)
         {
-            _context = context;
             _signInManager = signInManager;
+            _orderService = orderService;
+            _saleService = saleService;
+            _rentService = rentService;
+            _incomeService = incomeService;
         }
 
        [HttpGet]
@@ -32,14 +44,14 @@ namespace TailorApp.Web.Controllers
             {
                 return LocalRedirect("~/Identity/Account/Login");
             }
-            ViewBag.TotalOrders = _context.Orders.Count();
-            ViewBag.CompleteOrders = _context.Orders.Where(o=>o.IsDelivered==true).Count();
-            ViewBag.TotalSales = _context.SalesDetails.Count();
-            ViewBag.MonthSale = _context.SalesDetails.Where(x => DateTime.Compare(x.Sales.Date, DateTime.Today.AddMonths(-1)) >= 0).Sum(x=>x.Quantity);
-            ViewBag.TotalRent = _context.RentDetails.Sum(r => r.Quantity);
-            ViewBag.MonthRent = _context.RentDetails.Where(x => DateTime.Compare(x.Rent.RentDate, DateTime.Today.AddMonths(-1)) >= 0).Sum(x=>x.Quantity);
-            ViewBag.Income = _context.Incomes.Sum(i => i.Price);
-            ViewBag.MonthIncome = _context.Incomes.Where(x => DateTime.Compare(x.Date, DateTime.Today.AddMonths(-1)) >= 0).Sum(i => i.Price);
+            ViewBag.TotalOrders = _orderService.Total;
+            ViewBag.CompleteOrders = _orderService.TotalDelivered;
+            ViewBag.TotalSales = _saleService.Total;
+            ViewBag.MonthSale = _saleService.Monthly;
+            ViewBag.TotalRent = _rentService.Total;
+            ViewBag.MonthRent = _rentService.Monthly;
+            ViewBag.Income = _incomeService.Total;
+            ViewBag.MonthIncome = _incomeService.Monthly;
             return View();
         }
 

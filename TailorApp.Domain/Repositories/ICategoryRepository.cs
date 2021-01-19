@@ -11,6 +11,7 @@ namespace TailorApp.Domain.Repositories
     {
         IQueryable<Category> Categories { get; }
         Task<List<Category>> GetListAsync();
+        object GetMeasurementsByCategoryId(int id);
         Task<SelectList> GetSelectListAsync(int? selectedCategoryId);
         bool IsExists(int id);
         Task<Category> FindByIdAsync(int? id);

@@ -18,6 +18,8 @@ namespace TailorApp.Infrastructure.Data.Repositories
         }
 
         public IQueryable<Order> Orders => _context.Orders.AsQueryable();
+        public int Total => _context.Orders.Count();
+        public int TotalDelivered =>_context.Orders.Where(o => o.IsDelivered == true).Count();
 
         public async Task<List<Order>> GetListAsync()
         {
@@ -78,6 +80,12 @@ namespace TailorApp.Infrastructure.Data.Repositories
         public async Task UpdateDetailMeasurementAsync(OrderDetailMeasurement item)
         {
             _context.Update(item);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CreateDetailWithMeasurementAsync(OrderDetail orderDetail)
+        {
+            _context.AddRange(orderDetail);
             await _context.SaveChangesAsync();
         }
     }

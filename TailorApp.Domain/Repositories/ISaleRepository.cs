@@ -10,6 +10,8 @@ namespace TailorApp.Domain.Repositories
 {
     public interface ISaleRepository : IScopedService
     {
+        int Total { get; }
+        int Monthly { get; }
         IQueryable<Sales> Sales { get; }
         Task<List<Sales>> GetListAsync();
         Task<Sales> FindByIdAsync(int? id);

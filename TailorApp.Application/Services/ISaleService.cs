@@ -10,6 +10,8 @@ namespace TailorApp.Application.Services
 {
     public interface ISaleService : IScopedService
     {
+        int Total { get; }
+        int Monthly { get; }
         Task<List<Sales>> GetListAsync();
         Task<Sales> FindByIdAsync(int? id);
         Task CreateAsync(Sales sale);

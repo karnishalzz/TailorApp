@@ -16,8 +16,11 @@ namespace TailorApp.Application.Implementations
         {
             _orderRepository = orderRepository;
         }
+        public int Total => _orderRepository.Total;
+        public int TotalDelivered => _orderRepository.TotalDelivered;
         public async Task CreateAsync(Order Order)=> await _orderRepository.CreateAsync(Order);
-      
+
+        public async Task CreateDetailWithMeasurementAsync(OrderDetail orderDetail) =>await _orderRepository.CreateDetailWithMeasurementAsync(orderDetail);
         public async Task DeleteAsync(int id)=> await _orderRepository.DeleteAsync(id);
        
         public async Task<Order> FindByIdAsync(int? id)=> await _orderRepository.FindByIdAsync(id);

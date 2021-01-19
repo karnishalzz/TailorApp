@@ -10,6 +10,8 @@ namespace TailorApp.Application.Services
 {
     public interface IOrderService : IScopedService
     {
+        int Total { get; }
+        int TotalDelivered { get; }
         Task<List<Order>> GetListAsync();
         bool IsExists(int id);
         Task<Order> FindByIdAsync(int? id);
@@ -17,6 +19,7 @@ namespace TailorApp.Application.Services
         Task<OrderDetailMeasurement> GetDetailMeasurementById(int oderdetailId, int measurementId);
         Task UpdateDetailMeasurementAsync(OrderDetailMeasurement item);
         Task CreateAsync(Order Order);
+        Task CreateDetailWithMeasurementAsync(OrderDetail orderDetail);
         Task UpdateAsync(Order Order);
         Task DeleteAsync(int id);
     }

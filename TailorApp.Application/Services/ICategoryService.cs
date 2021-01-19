@@ -11,6 +11,7 @@ namespace TailorApp.Application.Services
     {
         Task<List<Category>> GetListAsync();
         Task<SelectList> GetSelectListAsync(int? selectedCategoryId = null);
+        object GetMeasurementsByCategoryId(int id);
         bool IsExists(int id);
         Task<Category> FindByIdAsync(int? id);
         Task CreateAsync(Category category);

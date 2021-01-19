@@ -17,6 +17,10 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = context;
         }
         public IQueryable<Income> Incomes => _context.Incomes.AsQueryable();
+        public decimal Total => _context.Incomes.Sum(i => i.Price);
+        public decimal Monthly => _context.Incomes
+            .Where(x => DateTime.Compare(x.Date, DateTime.Today.AddMonths(-1)) >= 0)
+            .Sum(i => i.Price);
 
         public async Task<Income> FindByIdAsync(int id)
         {

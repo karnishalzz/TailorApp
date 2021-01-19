@@ -19,6 +19,10 @@ namespace TailorApp.Infrastructure.Data.Repositories
         }
 
         public IQueryable<Rent> Rents => _context.Rents.AsQueryable();
+        public int Total => _context.RentReturnDetails.Sum(r => r.Quantity);
+        public int Monthly => _context.RentDetails
+            .Where(x => DateTime.Compare(x.Rent.RentDate, DateTime.Today.AddMonths(-1)) >= 0)
+            .Sum(x => x.Quantity);
         public async Task<List<Rent>> GetListAsync()
         {
             return await _context.Rents

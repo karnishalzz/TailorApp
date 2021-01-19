@@ -24,7 +24,8 @@ namespace TailorApp.Application.Implementations
         public async Task<Category> FindByIdAsync(int? id)=> await _categoryRepository.FindByIdAsync(id);
       
         public async Task<List<Category>> GetListAsync()=> await _categoryRepository.GetListAsync();
-       
+
+        public object GetMeasurementsByCategoryId(int id) => _categoryRepository.GetMeasurementsByCategoryId(id);
         public async Task<SelectList> GetSelectListAsync(int? selectedCategoryId = null)=> await _categoryRepository.GetSelectListAsync(selectedCategoryId);
 
         public bool IsExists(int id)=> _categoryRepository.IsExists(id);

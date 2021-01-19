@@ -10,6 +10,8 @@ namespace TailorApp.Application.Services
 {
     public interface IRentService: IScopedService
     {
+        int Total { get; }
+        int Monthly { get; }
         Task CreateAsync(Rent rent);
         Task UpdateAsync(Rent rent);
         Task<List<Rent>> GetListAsync();

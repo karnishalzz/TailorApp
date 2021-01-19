@@ -16,7 +16,8 @@ namespace TailorApp.Application.Implementations
         {
             _incomeRepository = incomeRepository;
         }
-
+        public decimal Total => _incomeRepository.Total;
+        public decimal Monthly => _incomeRepository.Monthly;
         public async Task CreateAsync(Income income) =>await _incomeRepository.CreateAsync(income);
 
         public async Task<Income> FindByIdAsync(int id) => await _incomeRepository.FindByIdAsync(id);

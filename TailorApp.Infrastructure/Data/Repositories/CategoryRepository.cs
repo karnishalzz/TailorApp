@@ -64,6 +64,22 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context.Categories.RemoveRange(item);
             await _context.SaveChangesAsync();
         }
-        
+
+        public object GetMeasurementsByCategoryId(int id)
+        {
+            var item=
+                  from c in _context.Categories
+                  join e in _context.Enrollments on c.CategoryID equals e.CategoryID
+                  join m in _context.Measurements on e.MeasurementID equals m.MeasurementID
+                  where c.CategoryID == id
+                  select new
+                  {
+                      m.MeasurementID,
+                      m.Name,
+                  };
+            return item;
+
+
+        }
     }
 }

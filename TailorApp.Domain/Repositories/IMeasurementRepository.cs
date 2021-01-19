@@ -10,6 +10,7 @@ namespace TailorApp.Domain.Repositories
     {
         IQueryable<Measurement> Measurements { get; }
         Task<List<Measurement>> GetListAsync();
+        
         bool IsExists(int id);
         Task<Measurement> FindByIdAsync(int? id);
         Task CreateAsync(Measurement measurement);

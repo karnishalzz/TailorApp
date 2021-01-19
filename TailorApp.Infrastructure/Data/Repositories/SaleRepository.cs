@@ -17,8 +17,11 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
             _context = context;
         }
-        public IQueryable<Sales> Sales => throw new NotImplementedException();
-
+        public IQueryable<Sales> Sales => _context.Sales.AsQueryable();
+        public int Total => _context.SalesDetails.Count();
+        public int Monthly => _context.SalesDetails
+            .Where(x => DateTime.Compare(x.Sales.Date, DateTime.Today.AddMonths(-1)) >= 0)
+            .Sum(x => x.Quantity);
         public async Task CreateAsync(Sales sale)
         {
             _context.Sales.AddRange(sale);
