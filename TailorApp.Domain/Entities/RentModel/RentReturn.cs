@@ -17,7 +17,7 @@ namespace TailorApp.Domain.Entities.RentModel
         public decimal Discount { get; set; }
         public decimal NetTotal { get; set; }
         public string Description { get; set; }
-        [Display(Name = "Date (MM/DD/YYYY)")]
+        [Display(Name = "Date")]
         public DateTime ReturnedDate { get; set; }
 
         public virtual ICollection<RentReturnDetail> RentReturnDetails { get; set; }

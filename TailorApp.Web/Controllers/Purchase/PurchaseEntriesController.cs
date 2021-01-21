@@ -75,6 +75,7 @@ namespace TailorApp.Web.Controllers.PurchaseController
                         purchaseDetails.Add(i);
                     }
                     purchase.PurchaseDetails = purchaseDetails;
+                    
 
                     await _purchaseService.CreateAsync(purchase);
 
@@ -136,13 +137,18 @@ namespace TailorApp.Web.Controllers.PurchaseController
                     {
                         item.Quantity += purchaseDetail.Quantity;
                         item.InitialQuantity += stock.Quantity;
+
+                        await _stockService.UpdateStockListAsync(existingStocks);
                         break;
                     }
+                    
                     count++;
                 }
                 if (count == existingStocks.Count())
                 {
-                    await _stockService.UpdateStockListAsync(existingStocks);
+                    stock.Quantity = purchaseDetail.Quantity;
+                    stock.InitialQuantity += purchaseDetail.Quantity;
+                    await _stockService.CreateAsync(stock);
                 }
             }
         }

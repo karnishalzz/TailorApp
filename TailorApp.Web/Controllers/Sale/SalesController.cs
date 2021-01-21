@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.SalesModule;
@@ -24,12 +25,16 @@ namespace TailorApp.Web.Controllers.Sale
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var sales = await _saleService.GetListAsync();
-            return View(sales);
+            return View();
         }
-
+        [HttpPost]
+        public async Task<JsonResult> LoadSaleList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _saleService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
+        }
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {

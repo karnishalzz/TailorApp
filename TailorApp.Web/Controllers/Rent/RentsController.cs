@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
@@ -24,13 +25,18 @@ namespace TailorApp.Web.Controllers.Rent
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        { 
+            return View();
+        }
+        [HttpPost]
+        public async Task<JsonResult> LoadRentList([FromBody] DataTableDto dataTableDto)
         {
-            var rents =await _rentService.GetListAsync();
-            return View(rents);
+            object dataTable = await _rentService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
         }
 
-        
+
 
     }
 }

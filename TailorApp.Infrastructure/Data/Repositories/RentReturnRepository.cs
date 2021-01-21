@@ -13,10 +13,13 @@ namespace TailorApp.Infrastructure.Data.Repositories
     {
         private readonly ApplicationDbContext _context;
 
+       
+
         public RentReturnRepository(ApplicationDbContext context)
         {
             _context = context;
         }
+        public IQueryable<RentReturn> RentReturns => _context.RentReturns.AsQueryable();
         public async Task<List<RentReturn>> GetListAsync()
         {
             return await _context.RentReturns

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Domain.Entities.RentModel;
 using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 
@@ -17,6 +18,6 @@ namespace TailorApp.Application.Services
         Task<List<Rent>> GetListAsync();
         Task<Rent> FindByIdAsync(int? id);
         Task<RentDetail> FindDetailByIdAsync(int id);
-        
+        Task<object> GetDataTableAsync(DataTableDto dataTableDto);
     }
 }

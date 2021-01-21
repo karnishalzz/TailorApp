@@ -10,8 +10,10 @@ namespace TailorApp.Domain.Repositories
 {
     public interface IRentReturnRepository : IScopedService
     {
+        IQueryable<RentReturn> RentReturns{ get; }
         Task<List<RentReturn>> GetListAsync();
         Task<RentReturn> FindByIdAsync(int id);
         Task CreateAsync(RentReturn rentReturn);
+       
     }
 }

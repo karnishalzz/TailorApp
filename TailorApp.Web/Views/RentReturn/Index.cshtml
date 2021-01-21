@@ -4,6 +4,14 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<style>
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
@@ -38,45 +46,38 @@
                                     @Html.DisplayNameFor(model => model.ReturnedDate)
                                 </th>
 
-                                <th></th>
+                                <th>Action</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RentID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Subtotal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Discount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.NetTotal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Description)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ReturnedDate)
+                                </th>
+
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.RentID)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Subtotal)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Discount)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.NetTotal)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Description)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ReturnedDate)
-                                    </td>
-
-                                    <td>
-                                        <a asp-action="ReturnDetails" asp-route-id="@item.RentReturnID"><i class="ti-list"></i></a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
+                       
                     </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
 
 @section scripts{
 
@@ -86,13 +87,68 @@
     <script>
 
         $(document).ready(function () {
-            $('#rentreturnTable').DataTable({
-                "paging": true,
-                "ordering": true,
-                "info": true
-            });
-        })
 
+            jQuery('#rentreturnTable thead tr:eq(0) th:not(:last,:first,:nth-child(6))').each(function () {
+                    var title = jQuery(this).text();
+                    jQuery(this).html('<input class="form-control" type="text" placeholder="Search ' + title + '" />');
+                });
+
+            var rentreturnTable = $("#rentreturnTable").DataTable({
+                'processing': true,
+                'serverSide': true,
+                "order": [[0, 'desc']],
+                'ajax': {
+                    'url': '@Url.Action("LoadRentReturnList", "RentReturn")',
+                    'method': 'POST',
+                    'contentType': 'application/json',
+                    'data': function (d) {
+                        return JSON.stringify(d);
+                    }
+                },
+                "lengthMenu": [[10, 15], [10, 15]],
+                "lengthChange": true,
+                "searching": true,
+                "scrollX": true,
+                //fixedColumns: {
+                //    leftColumns: 1,
+                //    rightColumns: 1
+                //},
+
+                'columns': [
+                    { data: "rentID", name: "RentID" },
+                    { data: "subtotal", name: "Subtotal" },
+                    { data: "discount", name: "Discount" },
+                    { data: "netTotal", name: "NetTotal" },
+                    { data: "description", name: "Description" },
+                    { data: "returnedDate", name: "ReturnedDate" },
+                    {
+                        data: "rentReturnID", name: "RentReturnID", searchable: false,
+                        render: function (data, type, row, meta) {
+                            return '<a href="/RentReturn/ReturnDetails/' + row.rentReturnID + '">' + '<i class="ti-list"></i></a>'
+
+                        }
+                    },
+                ]
+            });
+
+            // Individual Column Searching In case of Some Fixed Column
+            jQuery(document).on('focusout', '#rentreturnTable_wrapper thead input[type="text"]', function () {
+                rentreturnTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+
+
+            // Select List filtering
+
+            jQuery(rentreturnTable.table().container()).on('change', 'thead select', function () {
+                console.log(this.value);
+                rentreturnTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+        });
+       
     </script>
 
 }

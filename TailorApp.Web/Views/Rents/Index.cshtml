@@ -4,143 +4,204 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-block">
-                    <div class="col-lg-12">
-                        <b><i class="ti-tag"></i> <span><b>Rent List</b></span></b>
-                        <a class="btn btn-success" style="margin-bottom:12px;float:right;" href="/RentEntries/Index"><i class="ti-plus"></i>Create New</a>
-                    </div>
-                    <br />
-                    <hr />
-                    <div class="dt-responsive table-responsive">
-                        <table class="table table-striped table-bordered nowrap" id="rentsTable">
-                            <thead>
+<style>
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
 
-                                <tr>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.RentDate)
-                                    </th>
-                                    <th>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-block">
+                <div class="col-lg-12">
+                    <b><i class="ti-tag"></i> <span><b>Rent List</b></span></b>
+                    <a class="btn btn-success" style="margin-bottom:12px;float:right;" href="/RentEntries/Index"><i class="ti-plus"></i>Create New</a>
+                </div>
+                <br />
+                <hr />
+                <div class="dt-responsive table-responsive">
+                    <table class="table table-striped table-bordered nowrap" id="rentTable">
+                        <thead>
 
-                                        @Html.DisplayNameFor(model => model.ReturnDate)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Amount)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Discount)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.GrandTotal)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Customer)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.AdvancePayment)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Paid)
-                                    </th>
-                                    <th>Status</th>
-                                    <th>Returned</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.RentDate)
-                                    </td>
-                                    @{
-                                        if (item.ReturnDate.Date <= DateTime.Now && item.RentReturns.Sum(x => x.RentReturnDetails.Sum(y => y.Quantity)) != item.RentDetails.Sum(x => x.Quantity))
-                                        {
-                                            <td>
-                                                <span style="color:red;">
-                                                    @Html.DisplayFor(modelItem => item.ReturnDate)
-                                                </span>
-                                            </td>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RentID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RentDate)
+                                </th>
+                                <th>
 
-                                        }
-                                        else
-                                        {
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.ReturnDate)
-                                            </td>
-                                        }
-                                    }
+                                    @Html.DisplayNameFor(model => model.ReturnDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Amount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Discount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.GrandTotal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Customer)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.AdvancePayment)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Paid)
+                                </th>
+                                <th>Status</th>
+                                <th>Returned</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RentID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RentDate)
+                                </th>
+                                <th>
 
+                                    @Html.DisplayNameFor(model => model.ReturnDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Amount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Discount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.GrandTotal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Customer)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.AdvancePayment)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Paid)
+                                </th>
+                                <th>Status</th>
+                                <th>Returned</th>
+                            </tr>
+                        </thead>
+                       
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Amount)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Discount)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.GrandTotal)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Customer.Name)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.AdvancePayment)
-                                    </td>
-                                    <td>
-                                        @{
-                                            if (item.Paid == 0)
-                                            {
-                                                @Html.Label("-");
-                                            }
-                                            else
-                                            {
-                                                @Html.DisplayFor(modelItem => item.Paid)
-                                            }
-                                        }
-                                    </td>
-                                    <td class="txtCheckBox">
-                                        @{
-                                            if (item.IsPaid)
-                                            {
-                                                <a href="/RentReturn/Returns/@item.RentID" style="padding: 3px 10px 3px 10px; background-color:green " class="badge" readonly>Paid</a>
-                                            }
-                                            else
-                                            {
-                                                <a href="/RentReturn/Returns/@item.RentID" style="padding: 3px 10px 3px 10px; background-color:red " class="badge" readonly>Due</a>
-                                            }
-                                        }
-                                    </td>
-                                    <td class="txtCheckBox">
-                                        @item.RentReturns.Sum(x => x.RentReturnDetails.Sum(y => y.Quantity)) / @item.RentDetails.Sum(x => x.Quantity)
+@section scripts{
 
-                                    </td>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="~/js/Popup.js"></script>
+    <script>
 
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    </div></div></div></div>
-                    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+        $(document).ready(function () {
 
-                    @section scripts{
+            jQuery('#rentTable thead tr:eq(0) th:not(:last,:first,:nth-child(11))').each(function () {
+                    var title = jQuery(this).text();
+                    jQuery(this).html('<input class="form-control" type="text" placeholder="Search ' + title + '" />');
+                });
 
-                        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
-
-                        <script>
-
-                            $(document).ready(function () {
-                                $('#rentsTable').DataTable({
-                                    "paging": true,
-                                    "ordering": true,
-                                    "info": true
-                                });
-                            });
-
-
-                        </script>
-
+            var rentTable = $("#rentTable").DataTable({
+                'processing': true,
+                'serverSide': true,
+                "order": [[0, 'desc']],
+                'ajax': {
+                    'url': '@Url.Action("LoadRentList", "Rents")',
+                    'method': 'POST',
+                    'contentType': 'application/json',
+                    'data': function (d) {
+                        return JSON.stringify(d);
                     }
+                },
+                "lengthMenu": [[10, 15], [10, 15]],
+                "lengthChange": true,
+                "searching": true,
+                "scrollX": true,
+                //fixedColumns: {
+                //    leftColumns: 1,
+                //    rightColumns: 1
+                //},
+
+                'columns': [
+                    {
+                        data: "rentID", name: "RentID",
+                    },
+                    { data: "rentDate", name: "RentDate", },
+                    {
+                        data: "returnDate", name: "returnDate", searchable: false,
+                        render: function (data, type, row, meta) {
+                            if (row.IsDateOver == "true" && row.IsEqual=="true")
+                                return '<label style="color:red;">' + row.returnDate + '</label>'
+                            else
+                                return '<label>' + row.returnDate+'</label>'
+
+                        },
+                    },
+
+                    { data: "amount", name: "Amount", },
+                    { data: "discount", name: "Discount",},
+                    { data: "grandTotal", name: "GrandTotal",},
+                    { data: "customer", name: "Customer", },
+                    { data: "advancePayment", name: "advancePayment", },
+                    {
+                        data: "paid", name: "Paid",
+                        render: function (data, type, row, meta) {
+                            if (row.paid == "0")
+                                return '<label> - </label>'
+                            else
+                                return '<label>' + row.paid + '</label>'
+
+                        },
+                    },
+
+                    {
+                        data: "isPaid", name: "isPaid",
+                        render: function (data, type, row, meta) {
+                            if (row.isPaid == "true")
+                                return '<a href="/RentReturn/Returns/'+row.rentID+'" style="padding: 3px 10px 3px 10px; background-color:green " class="badge" readonly>Paid</a>'
+                            else
+                                return '<a href="/RentReturn/Returns/+'+row.rentID+'" style="padding: 3px 10px 3px 10px; background-color:red " class="badge" readonly>Due</a>'
+
+                        },
+                    },
+                    {
+                        data: "orderID", name: "orderID",
+                        render: function (data, type, row, meta) {
+                            return row.returned +' / '+ row.total
+
+                        }
+                    },
+                ]
+            });
+
+            // Individual Column Searching In case of Some Fixed Column
+            jQuery(document).on('focusout', '#rentTable_wrapper thead input[type="text"]', function () {
+                rentTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+
+
+            // Select List filtering
+
+            jQuery(rentTable.table().container()).on('change', 'thead select', function () {
+                console.log(this.value);
+                rentTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+    </script>
+
+}

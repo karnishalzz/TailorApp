@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.InventoryModel;
@@ -37,6 +38,13 @@ namespace TailorApp.Web.Controllers.Rent
         {
             var rents = await _rentReturnService.GetListAsync();
             return View(rents);
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<JsonResult> LoadRentReturnList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _rentReturnService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
         }
 
         [Authorize(Roles = "Admin,Manager")]

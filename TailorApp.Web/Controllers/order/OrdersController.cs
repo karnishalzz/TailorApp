@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
@@ -15,6 +16,7 @@ using TailorApp.Web.ViewModels;
 
 namespace TailorApp.Web.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
    
@@ -54,15 +56,19 @@ namespace TailorApp.Web.Controllers
             return View();
         }
 
-        [Authorize]
+        
         [HttpGet]
-        public async Task<IActionResult> ViewOrder()
+        public IActionResult ViewOrder()
         {
-            List<Order> model = await _orderService.GetListAsync();
-            return View(model);
+            return View();
+        }
+        [HttpPost]
+        public async Task<JsonResult> LoadOrderList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _orderService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> ViewOrderDetails(int id)
         {
@@ -178,7 +184,7 @@ namespace TailorApp.Web.Controllers
         }
 
         
-        [Authorize]
+
         [HttpPost]
         public async Task<IActionResult> EditOrderMeasurements(OrderDetailMeasurement item)
         {
@@ -187,8 +193,7 @@ namespace TailorApp.Web.Controllers
             await _orderService.UpdateDetailMeasurementAsync(itemTobeUpdated);
             return Redirect("../Orders/ViewOrderDetails/" + item.OrderDetailID);
         }
-        
-        [Authorize]
+  
         [HttpGet]
         public async Task<IActionResult> OrderInvoice(int id)
         {

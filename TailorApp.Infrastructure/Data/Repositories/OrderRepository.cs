@@ -17,7 +17,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Order> Orders => _context.Orders.AsQueryable();
+        public IQueryable<Order> Orders => _context.Orders.Include(o => o.Customer).AsQueryable();
         public int Total => _context.Orders.Count();
         public int TotalDelivered =>_context.Orders.Where(o => o.IsDelivered == true).Count();
 

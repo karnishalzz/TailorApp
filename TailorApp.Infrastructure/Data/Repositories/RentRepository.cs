@@ -18,7 +18,12 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Rent> Rents => _context.Rents.AsQueryable();
+        public IQueryable<Rent> Rents => _context.Rents
+            .Include(r => r.Customer)
+            .Include(r => r.RentDetails)
+            .Include(r => r.RentReturns)
+            .ThenInclude(r => r.RentReturnDetails)
+            .AsQueryable();
         public int Total => _context.RentReturnDetails.Sum(r => r.Quantity);
         public int Monthly => _context.RentDetails
             .Where(x => DateTime.Compare(x.Rent.RentDate, DateTime.Today.AddMonths(-1)) >= 0)

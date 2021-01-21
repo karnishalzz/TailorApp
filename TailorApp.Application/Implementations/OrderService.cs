@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Repositories;
@@ -38,6 +41,76 @@ namespace TailorApp.Application.Implementations
        
         public async Task UpdateDetailMeasurementAsync(OrderDetailMeasurement item)=> 
             await _orderRepository.UpdateDetailMeasurementAsync(item);
-    
+
+        public async Task<object> GetDataTableAsync(DataTableDto dataTableDto)
+        {
+            try
+            {
+                if (dataTableDto == null)
+                {
+                    throw new ArgumentNullException(nameof(dataTableDto));
+                }
+
+                int draw = dataTableDto.Draw;
+                int start = dataTableDto.Start;
+                int length = dataTableDto.Length;
+
+                // Sorting Column and order
+                string sortColumnName = dataTableDto.Columns[dataTableDto.Order[0].Column].Name;
+                string sortColumnDir = dataTableDto.Order[0].Dir;
+
+                // Individual Column Search value
+                string deliverDate = dataTableDto.Columns[1].Search.Value;
+                string orderDate = dataTableDto.Columns[2].Search.Value;
+                string customer = dataTableDto.Columns[3].Search.Value;
+                DateTime _orderDate,_deliverDate;
+             
+
+                IQueryable<Order> orderAsQueryable = _orderRepository.Orders;
+
+                int recordsTotal = orderAsQueryable.Count();
+
+                if (!string.IsNullOrWhiteSpace(deliverDate) && DateTime.TryParse(deliverDate,out _deliverDate))
+                {
+                    orderAsQueryable = orderAsQueryable.Where(m => m.DeliverDate==_deliverDate);
+                }
+                if (!string.IsNullOrWhiteSpace(orderDate) && DateTime.TryParse(orderDate, out _orderDate))
+                {
+                    orderAsQueryable = orderAsQueryable.Where(m => m.DeliverDate == _orderDate);
+                }
+
+                if (!string.IsNullOrWhiteSpace(customer))
+                {
+                    orderAsQueryable = orderAsQueryable.Where(m => m.Customer.Name.Contains(customer));
+                }
+               
+
+                int recordsFiltered = orderAsQueryable.Count();
+
+
+                var orders = await orderAsQueryable.Select(m => new
+                {
+                    m.OrderID,
+                    DeliverDate=m.DeliverDate.ToShortDateString(),
+                    OrderDate=m.OrderDate.ToShortDateString(),
+                    Customer=m.Customer.Name,
+                    m.IsDelivered,
+                   
+                }).OrderBy(sortColumnName + " " + sortColumnDir).Skip(start).Take(length).ToListAsync();
+
+                return new
+                {
+                    draw,
+                    recordsTotal,
+                    recordsFiltered,
+                    data = orders
+                };
+            }
+            catch (Exception exception)
+            {
+                throw;
+            }
+        }
+
     }
 }
