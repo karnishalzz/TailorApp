@@ -72,13 +72,18 @@ namespace TailorApp.Application.Implementations
 
 
                 int recordsFiltered = categoryAsQueryable.Count();
+                
 
                 var categories = await categoryAsQueryable.Select(m => new
                 {
                     m.CategoryID,
                     m.Name,
-                    
-                    m.Description
+                    m.Description,
+                    Measurements = m.Enrollments.Where(x => x.CategoryID == m.CategoryID).Select(n => new
+                    {
+                        n.Measurement.Name
+                    })
+
                 }).OrderBy(sortColumnName + " " + sortColumnDir).Skip(start).Take(length).ToListAsync();
 
                 return new

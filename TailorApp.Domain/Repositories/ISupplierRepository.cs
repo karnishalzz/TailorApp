@@ -11,6 +11,7 @@ namespace TailorApp.Domain.Repositories
 {
     public interface ISupplierRepository : IScopedService
     {
+        IQueryable<Supplier> Suppliers { get; }
         Task<List<Supplier>> GetListAsync();
         Task<SelectList> GetSelectListAsync(int? selectedSupplierId);
         bool IsExists(int id);

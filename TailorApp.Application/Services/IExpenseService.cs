@@ -17,5 +17,6 @@ namespace TailorApp.Application.Services
         Task CreateAsync(Expense Expense);
         Task UpdateAsync(Expense Expense);
         Task DeleteAsync(int id);
+        Task<object> GetDataTableAsync(DataTableDto dataTableDto);
     }
 }

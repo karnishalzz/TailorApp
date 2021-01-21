@@ -17,7 +17,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Product> Products => _context.Products.AsQueryable();
+        public IQueryable<Product> Products => _context.Products.Include(x=>x.Category).AsQueryable();
 
         public async Task CreateAsync(Product Product)
         {

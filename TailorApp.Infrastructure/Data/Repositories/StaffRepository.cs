@@ -17,7 +17,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Staff> Staff => _context.Staff.AsQueryable();
+        public IQueryable<Staff> Staffs => _context.Staff.AsQueryable();
 
         public async Task CreateAsync(Staff Staff)
         {

@@ -16,7 +16,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
         {
             _context = context;
         }
-        public IQueryable<Purchase> Purchases => _context.Purchases.AsQueryable();
+        public IQueryable<Purchase> Purchases => _context.Purchases.Include(i => i.Supplier).AsQueryable();
 
         public async Task<List<Purchase>> GetListAsync()
         {
@@ -45,7 +45,7 @@ namespace TailorApp.Infrastructure.Data.Repositories
         }
 
        
-        public async Task<PurchaseDetail> FindDetailByIdAsync(int id)
+        public async Task<PurchaseDetail> FindDetailByIdAsync(int? id)
         {
             return await _context.PurchaseDetails
                 .Where(x => x.PurchaseDetailID == id)

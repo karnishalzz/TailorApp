@@ -16,7 +16,7 @@ namespace TailorApp.Domain.Repositories
         Task CreateAsync(Purchase purchase);
         Task UpdateAsync(Purchase purchase);
         bool DetailIsExists(int id);
-        Task<PurchaseDetail> FindDetailByIdAsync(int id);
+        Task<PurchaseDetail> FindDetailByIdAsync(int? id);
         Task UpdateDetailAsync(PurchaseDetail purchaseDetail);
     }
 }

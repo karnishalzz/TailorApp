@@ -89,7 +89,8 @@ namespace TailorApp.Application.Implementations
                     m.Name,
                     m.Phone,
                     m.Address,
-                    RegisterDate = m.RegisterDate.ToShortDateString()
+                    RegisterDate = m.RegisterDate.ToShortDateString(),
+                    m.ImagePath
                 }).OrderBy(sortColumnName + " " + sortColumnDir).Skip(start).Take(length).ToListAsync();
 
                 return new

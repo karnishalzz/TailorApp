@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Infrastructure.Data;
@@ -34,11 +35,17 @@ namespace TailorApp.Web.Controllers
 
         
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var incomes = await _incomeService.GetListAsync();
-            return View(incomes );
+            return View();
         }
+        [HttpPost]
+        public async Task<JsonResult> LoadIncomeList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _incomeService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Details(int id)

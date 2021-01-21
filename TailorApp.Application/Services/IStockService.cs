@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Domain.Entities.InventoryModel;
 using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 
@@ -16,6 +17,8 @@ namespace TailorApp.Application.Services
         Task CreateAsync(Stock stock);
         Task UpdateStockListAsync(List<Stock> stocks);
         Task<List<Stock>> GetByItemCategory(int itemId, CategoryType category);
+
+        Task<object> GetDataTableAsync(DataTableDto dataTableDto);
 
     }
 }

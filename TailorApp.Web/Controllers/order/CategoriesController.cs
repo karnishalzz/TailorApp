@@ -28,11 +28,9 @@ namespace TailorApp.Web.Controllers
 
         
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var categories = await _categoryService.GetListAsync();
-            return View(categories);
-            //return View();
+            return View();
         }
         [HttpPost]
         public async Task<JsonResult> LoadCategoryList([FromBody] DataTableDto dataTableDto)

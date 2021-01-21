@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.Base;
@@ -35,12 +36,16 @@ namespace TailorApp.Web.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var categoryList =await _productService.GetListAsync();
-            return View(categoryList);
+            return View();
         }
-
+        [HttpPost]
+        public async Task<JsonResult> LoadProductList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _productService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
+        }
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {

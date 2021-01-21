@@ -62,7 +62,7 @@
                                         @Html.DisplayNameFor(model => model.Address)
                                     </th>
                                     <th>
-                                        @Html.DisplayNameFor(model => model.RegisterDate)
+                                       Register Date
                                     </th>
                                     <th>Action</th>
                                 </tr>
@@ -81,7 +81,7 @@
                                         @Html.DisplayNameFor(model => model.Address)
                                     </th>
                                     <th>
-                                        @Html.DisplayNameFor(model => model.RegisterDate)
+                                       Register Date
                                     </th>
                                     <th>Action</th>
                                 </tr>
@@ -165,7 +165,13 @@
                         data: "customerID", name: "CustomerID",
                     },
 
-                    { data: "name", name: "Name" },
+                    {
+                        data: "name", name: "Name",
+                        render: function (data, type, row, meta) {
+                            return '<img src=' + row.imagePath + ' class="rounded-circle" height="40" width="40" asp-append-version="true" />' +
+                                ' - ' + row.name + ''
+                        }
+                    },
                     { data: "phone", name: "Phone" },
                     { data: "address", name: "Address" },
                     { data: "registerDate", name: "RegisterDate" },

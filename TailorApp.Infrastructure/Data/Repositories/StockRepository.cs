@@ -17,7 +17,10 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Stock> Stocks => _context.Stocks.AsQueryable();
+        public IQueryable<Stock> Stocks => _context.Stocks
+            .Include(s => s.Item)
+            .Include(s => s.Purchase)
+            .AsQueryable();
 
         public async Task<List<Stock>> GetListAsync()
         {

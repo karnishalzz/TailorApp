@@ -16,7 +16,10 @@ namespace TailorApp.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Category> Categories => _context.Categories.AsQueryable();
+        public IQueryable<Category> Categories => _context.Categories
+            .Include(x=>x.Enrollments)
+            .ThenInclude(y=>y.Measurement)
+            .AsQueryable();
 
         public async Task<List<Category>> GetListAsync()
         {

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.PurchaseModel;
@@ -24,11 +25,17 @@ namespace TailorApp.Web.Controllers.StockController
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var items = await _purchaseService.GetListAsync();
-            return View(items);
+            return View();
         }
+        [HttpPost]
+        public async Task<JsonResult> LoadPurchaseList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _purchaseService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
@@ -53,7 +60,7 @@ namespace TailorApp.Web.Controllers.StockController
             {
                 return NotFound();
             }
-            var purchase = await _purchaseService.FindByIdAsync(id);
+            var purchase = await _purchaseService.FindDetailByIdAsync(id);
 
            
             if (purchase == null)

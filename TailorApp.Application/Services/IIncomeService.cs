@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Domain.Entities;
 using TanvirArjel.Extensions.Microsoft.DependencyInjection;
 
@@ -19,5 +20,6 @@ namespace TailorApp.Application.Services
         Task<Income> GetByRentId(int rentId);
         Task UpdateAsync(Income income);
         Task CreateAsync(Income income);
+        Task<object> GetDataTableAsync(DataTableDto dataTableDto);
     }
 }

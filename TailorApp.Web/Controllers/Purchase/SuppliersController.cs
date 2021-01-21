@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TailorApp.Application.Dtos.DataTableDtos;
 using TailorApp.Application.Services;
 using TailorApp.Domain.Entities;
 using TailorApp.Domain.Entities.PurchaseModel;
@@ -24,13 +25,17 @@ namespace TailorApp.Web.Controllers.PurchaseController
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var suppliers =await _supplierService.GetListAsync();
-            return View(suppliers);
+            return View();
+        }
+        [HttpPost]
+        public async Task<JsonResult> LoadSupplierList([FromBody] DataTableDto dataTableDto)
+        {
+            object dataTable = await _supplierService.GetDataTableAsync(dataTableDto);
+            return Json(dataTable);
         }
 
-       
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {

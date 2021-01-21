@@ -102,7 +102,9 @@
                     {
                         data: "measurementID", name: "MeasurementID", searchable: false,
                         render: function (data, type, row, meta) {
-                            return '<a target="_blank" style="color: purple;font-weight: bold;" class ="btn btn-primary btn-sm" href="/Measurements/Edit/'+ row.measurementID +'">'+"Edit"+'</a>';
+                            return '<a href="/Measurements/Edit/' + row.measurementID + '">' + '<i class="ti-pencil"></i></a> | ' +
+                                '<a data-toggle="ajax-modal" id="delete" data-target="#customerModal" href="/Measurements/Details/' + row.measurementID + '">' + '<i class="ti-list"></i></a> | ' +
+                                '<a data-toggle="ajax-modal" id="delete" data-target="#customerModal" href="/Measurements/Delete/' + row.measurementID + '">' + '<i class="ti-trash"></i></a>'
 
                         }
                     },

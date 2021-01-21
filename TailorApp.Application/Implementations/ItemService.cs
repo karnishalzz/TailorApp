@@ -88,9 +88,10 @@ namespace TailorApp.Application.Implementations
                 {
                     m.ItemID,
                     m.Name,
-                    Unit=m.Unit.Value,
+                    Unit=m.Unit.ToString(),
                     m.Description,
-                    LastUpdated = m.LastUpdated.ToShortDateString()
+                    LastUpdated = m.LastUpdated.ToShortDateString(),
+                    m.ImagePath
                 }).OrderBy(sortColumnName + " " + sortColumnDir).Skip(start).Take(length).ToListAsync();
 
                 return new

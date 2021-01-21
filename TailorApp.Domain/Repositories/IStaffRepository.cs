@@ -10,6 +10,7 @@ namespace TailorApp.Domain.Repositories
 {
     public interface IStaffRepository : IScopedService
     {
+        IQueryable<Staff> Staffs { get; }
         Task<List<Staff>> GetListAsync();
         bool IsExists(int id);
         Task<Staff> FindByIdAsync(int? id);

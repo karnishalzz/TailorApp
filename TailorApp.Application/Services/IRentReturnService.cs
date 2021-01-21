@@ -13,5 +13,6 @@ namespace TailorApp.Application.Services
         Task<List<RentReturn>> GetListAsync();
         Task<RentReturn> FindByIdAsync(int id);
         Task CreateAsync(RentReturn rentReturn);
+
     }
 }

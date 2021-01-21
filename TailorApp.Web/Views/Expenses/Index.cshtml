@@ -4,92 +4,166 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-block">
-                    <div id="placeHolder"></div>
+<style>
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
 
-                    <div class="col-lg-12">
-                        <b><i class="ti-tag"></i> <span> Expense List</span></b>
-                        <a class="btn btn-success" style="margin-bottom:12px;float:right;" data-toggle="ajax-modal" id="categoryButton" data-target="#expenseModal" data-url="@Url.Action("Create")"><i class="ti-plus"></i>Create New</a>
-                    </div>
-                    <br />
-                    <hr />
-                    <div class="dt-responsive table-responsive">
-                        <table class="table table-striped table-bordered" style="width:100%" id="expenseTable">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Type)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Price)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Description)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Date)
-                                    </th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Type)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Price)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Description)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Date)
-                                        </td>
-                                        @if (item.Type != ExpenseType.Purchase)
-                                        {
-                                            <td>
-                                                <a data-toggle="ajax-modal" id="MeasurementButton" data-target="#expenseModal" data-url="@Url.Action($"Edit/{item.ExpenseID}")"><i class="ti-pencil"></i></a>|
-                                                <a data-toggle="ajax-modal" id="delete" data-target="#expenseModal" data-url="@Url.Action($"Delete/{item.ExpenseID}")"><i class="ti-trash"></i></a>
-                                            </td>
-                                        }
-                                        else
-                                        {
-                                            <td>
-                                                <a asp-action="Details" asp-route-id="@item.ExpenseID"><i class="ti-list"></i></a>
-                                            </td>
-                                        }
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-block">
+                <div id="placeHolder"></div>
 
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    </div></div></div></div>
-                    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+                <div class="col-lg-12">
+                    <b><i class="ti-tag"></i> <span> Expense List</span></b>
+                    <a class="btn btn-success" style="margin-bottom:12px;float:right;" data-toggle="ajax-modal" id="categoryButton" data-target="#expenseModal" data-url="@Url.Action("Create")"><i class="ti-plus"></i>Create New</a>
+                </div>
+                <br />
+                <hr />
+                <div class="dt-responsive table-responsive">
+                    <table class="table table-striped table-bordered" style="width:100%" id="expenseTable">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ExpenseID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Type)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Price)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Description)
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>Action</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ExpenseID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Type)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Price)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Description)
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
 
-                    @section scripts{
-
-                        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
-                        <script type="text/javascript" src="~/js/Popup.js"></script>
-                        <script>
-
-                            $(document).ready(function () {
-                                $('#expenseTable').DataTable({
-                                    "paging": true,
-                                    "ordering": true,
-                                    "info": true
-                                });
-                            });
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
+@section scripts{
 
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="~/js/Popup.js"></script>
+    <script>
 
-                        </script>
+        $(document).ready(function () {
 
+            jQuery('#expenseTable thead tr:eq(0) th:not(:last,:first,:nth-child(6))').each(function () {
+                    var title = jQuery(this).text();
+                    jQuery(this).html('<input class="form-control" type="text" placeholder="Search ' + title + '" />');
+                });
+
+            var expenseTable = $("#expenseTable").DataTable({
+                'processing': true,
+                'serverSide': true,
+                "order": [[0, 'desc']],
+                'ajax': {
+                    'url': '@Url.Action("LoadExpenseList", "Expenses")',
+                    'method': 'POST',
+                    'contentType': 'application/json',
+                    'data': function (d) {
+                        return JSON.stringify(d);
                     }
+                },
+                "lengthMenu": [[10, 15], [10, 15]],
+                "lengthChange": true,
+                "searching": true,
+                "scrollX": true,
+                //fixedColumns: {
+                //    leftColumns: 1,
+                //    rightColumns: 1
+                //},
+
+                'columns': [
+                    { data: "expenseID", name: "ExpenseID" },
+                    { data: "type", name: "Type" },
+                    { data: "price", name: "Price" },
+                    { data: "description", name: "Description" },
+                    { data: "date", name: "Date" },
+                    {
+                        data: "expenseID", name: "ExpenseID", searchable: false,
+                        render: function (data, type, row, meta) {
+                            if (row.type != "Purchase")
+                                return ' <a data-toggle="ajax-modal" id="MeasurementButton" data-target="#expenseModal" href="/Expenses/Edit/' + row.expenseID + '"><i class="ti-pencil"></i></a> | ' +
+                                    '<a data-toggle="ajax-modal" id="delete" data-target="#expenseModal" data-target="#expenseModal" href="/Expenses/Delete/' + row.expenseID + '"><i class="ti-trash"></i></a> '
+                            else
+                                return '<a href="/Expenses/Details/' + row.expenseID + '">' + '<i class="ti-list"></i></a>'
+
+                        }
+                    },
+                ]
+            });
+
+            // Individual Column Searching In case of Some Fixed Column
+            jQuery(document).on('focusout', '#customerTable_wrapper thead input[type="text"]', function () {
+                expenseTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+
+
+            // Select List filtering
+
+            jQuery(expenseTable.table().container()).on('change', 'thead select', function () {
+                console.log(this.value);
+                expenseTable.column(jQuery(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+            });
+        });
+        function PreviewImg(input) {
+            var File = input.files;
+
+            if (File && File[0]) {
+                ReadImage(File[0]);
+            }
+        }
+    </script>
+
+}
+
+@*@if (item.Type != ExpenseType.Purchase)
+{
+    <td>
+        <a data-toggle="ajax-modal" id="MeasurementButton" data-target="#expenseModal" data-url="@Url.Action($"Edit/{item.ExpenseID}")"><i class="ti-pencil"></i></a>|
+        <a data-toggle="ajax-modal" id="delete" data-target="#expenseModal" data-url="@Url.Action($"Delete/{item.ExpenseID}")"><i class="ti-trash"></i></a>
+    </td>
+}
+else
+{
+    <td>
+        <a asp-action="Details" asp-route-id="@item.ExpenseID"><i class="ti-list"></i></a>
+    </td>
+}*@
